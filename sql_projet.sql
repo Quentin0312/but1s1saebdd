@@ -5,7 +5,6 @@
 DROP TABLE IF EXISTS Concerne;
 DROP TABLE IF EXISTS Tri;
 DROP TABLE IF EXISTS Recolte;
-DROP TABLE IF EXISTS Récolte;
 DROP TABLE IF EXISTS Distance_entre_benne;
 DROP TABLE IF EXISTS Achat;
 DROP TABLE IF EXISTS Client;
@@ -16,97 +15,95 @@ DROP TABLE IF EXISTS Type_vetement;
 DROP TABLE IF EXISTS Benne_collecte;
 
 CREATE TABLE Benne_collecte(
-   ID_benne INT AUTO_INCREMENT,
-   Emplacement_benne VARCHAR(50),
-   Distance_magasin INT,
-   PRIMARY KEY(ID_benne)
+   id_benne INT AUTO_INCREMENT,
+   emplacement_benne VARCHAR(50),
+   distance_magasin INT,
+   PRIMARY KEY(id_benne)
 );
 
 CREATE TABLE Type_vetement(
-   ID_type INT AUTO_INCREMENT,
-   Libelle_type VARCHAR(50),
-   Prix_kg_type DECIMAL(19,4),
-   PRIMARY KEY(ID_type)
+   id_type INT AUTO_INCREMENT,
+   libelle_type VARCHAR(50),
+   prix_kg_type DECIMAL(15,2),
+   PRIMARY KEY(id_type)
 );
 
 CREATE TABLE Categorie_client(
-   ID_catégorie INT AUTO_INCREMENT,
-   Libelle_catégorie VARCHAR(50),
-   PRIMARY KEY(ID_catégorie)
+   id_categorie INT AUTO_INCREMENT,
+   libelle_categorie VARCHAR(50),
+   PRIMARY KEY(id_categorie)
 );
 
 CREATE TABLE Reduction(
-   ID_reduction INT AUTO_INCREMENT,
-   Valeur_réduction INT,
-   ID_type INT NOT NULL,
-   ID_catégorie INT NOT NULL,
-   PRIMARY KEY(ID_reduction),
-   FOREIGN KEY(ID_type) REFERENCES Type_vetement(ID_type),
-   FOREIGN KEY(ID_catégorie) REFERENCES Categorie_client(ID_catégorie)
+   id_reduction INT AUTO_INCREMENT,
+   valeur_reduction INT,
+   id_type INT NOT NULL,
+   id_categorie INT NOT NULL,
+   PRIMARY KEY(id_reduction),
+   FOREIGN KEY(id_type) REFERENCES Type_vetement(id_type),
+   FOREIGN KEY(id_categorie) REFERENCES Categorie_client(id_categorie)
 );
 
 CREATE TABLE Ramassage(
-   ID_ramassage INT AUTO_INCREMENT,
-   Date_ramassage DATE,
-   PRIMARY KEY(ID_ramassage)
+   id_ramassage INT AUTO_INCREMENT,
+   date_ramassage DATE,
+   PRIMARY KEY(id_ramassage)
 );
 
 CREATE TABLE Client(
-   ID_client INT AUTO_INCREMENT,
-   Nom_client VARCHAR(50),
-   Tel_client VARCHAR(50),
-   Adresse_client VARCHAR(50),
-   Email_client VARCHAR(50),
-   Date_naissace_client DATE,
-   ID_catégorie INT NOT NULL,
-   PRIMARY KEY(ID_client),
-   FOREIGN KEY(ID_catégorie) REFERENCES Categorie_client(ID_catégorie)
+   id_client INT AUTO_INCREMENT,
+   nom_client VARCHAR(50),
+   tel_client VARCHAR(50),
+   adresse_client VARCHAR(50),
+   email_client VARCHAR(50),
+   date_naissace_client DATE,
+   id_categorie INT NOT NULL,
+   PRIMARY KEY(id_client),
+   FOREIGN KEY(id_categorie) REFERENCES Categorie_client(id_categorie)
 );
 
 CREATE TABLE Achat(
-   ID_achat INT AUTO_INCREMENT,
-   Date_achat DATE,
-   Prix_total INT,
-   ID_client INT NOT NULL,
-   PRIMARY KEY(ID_achat),
-   FOREIGN KEY(ID_client) REFERENCES Client(ID_client)
+   id_achat INT AUTO_INCREMENT,
+   date_achat DATE,
+   prix_total DECIMAL(19,4),
+   id_client INT NOT NULL,
+   PRIMARY KEY(id_achat),
+   FOREIGN KEY(id_client) REFERENCES Client(id_client)
 );
 
 CREATE TABLE Distance_entre_benne(
-   ID_benne INT,
-   ID_benne_1 INT,
-   Distance_benne VARCHAR(50),
-   PRIMARY KEY(ID_benne, ID_benne_1),
-   FOREIGN KEY(ID_benne) REFERENCES Benne_collecte(ID_benne),
-   FOREIGN KEY(ID_benne_1) REFERENCES Benne_collecte(ID_benne)
+   id_benne_1 INT,
+   id_benne_2 INT,
+   distance_benne INT,
+   PRIMARY KEY(id_benne_1, id_benne_2),
+   FOREIGN KEY(id_benne_1) REFERENCES Benne_collecte(id_benne),
+   FOREIGN KEY(id_benne_2) REFERENCES Benne_collecte(id_benne)
 );
 
 CREATE TABLE Recolte(
-   ID_benne INT,
-   ID_ramassage INT,
-   PRIMARY KEY(ID_benne, ID_ramassage),
-   FOREIGN KEY(ID_benne) REFERENCES Benne_collecte(ID_benne),
-   FOREIGN KEY(ID_ramassage) REFERENCES Ramassage(ID_ramassage)
+   id_benne INT,
+   id_ramassage INT,
+   PRIMARY KEY(id_benne, id_ramassage),
+   FOREIGN KEY(id_benne) REFERENCES Benne_collecte(id_benne),
+   FOREIGN KEY(id_ramassage) REFERENCES Ramassage(id_ramassage)
 );
 
 CREATE TABLE Tri(
-   ID_type INT,
-   ID_ramassage INT,
-    # DECIMAL(?,?)
-   Poids_type_trié DECIMAL(15,2),
-   PRIMARY KEY(ID_type, ID_ramassage),
-   FOREIGN KEY(ID_type) REFERENCES Type_vetement(ID_type),
-   FOREIGN KEY(ID_ramassage) REFERENCES Ramassage(ID_ramassage)
+   id_type INT,
+   id_ramassage INT,
+   poids_type_trie DECIMAL(15,2),
+   PRIMARY KEY(id_type, id_ramassage),
+   FOREIGN KEY(id_type) REFERENCES Type_vetement(id_type),
+   FOREIGN KEY(id_ramassage) REFERENCES Ramassage(id_ramassage)
 );
 
 CREATE TABLE Concerne(
-   ID_achat INT,
-   ID_reduction INT,
-    # DECIMAL(?,?)
-   Poid_type_vetement DECIMAL(15,2),
-   PRIMARY KEY(ID_achat, ID_reduction),
-   FOREIGN KEY(ID_achat) REFERENCES Achat(ID_achat),
-   FOREIGN KEY(ID_reduction) REFERENCES Reduction(ID_reduction)
+   id_achat INT,
+   id_reduction INT,
+   poid_type_vetement DECIMAL(15,2),
+   PRIMARY KEY(id_achat, id_reduction),
+   FOREIGN KEY(id_achat) REFERENCES Achat(id_achat),
+   FOREIGN KEY(id_reduction) REFERENCES Reduction(id_reduction)
 );
 
 SHOW TABLES;
