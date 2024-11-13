@@ -1,6 +1,11 @@
 # Règles de nommage
 # https://sql.sh/1396-nom-table-colonne
-# TODO : Les appliquer (Dans loopping puis copier coller !)!
+# TODO :
+# - Discuter des commentaires présent dans le script
+# - Enrichir le jeu de test selon les requêtes voulues (besoin d'aide)
+# - Proposer les requetes au groupe
+# - Faire les requêtes (besoin d'aide)
+# - Rédiger le MLD (utiliser looping)
 
 DROP TABLE IF EXISTS Concerne;
 DROP TABLE IF EXISTS Tri;
@@ -165,8 +170,8 @@ VALUES (1, 'DOE Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outloo
 
 
 INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
-VALUES (1, '2024-10-28', 15.5, 2),
-       (2, '2024-11-04', 25, 1);
+VALUES (1, '2024-11-04', 15.5, 2),
+       (2, '2024-11-07', 25, 1);
 
 INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
 VALUES (1, 2, 2100),
@@ -186,6 +191,13 @@ VALUES (1, 1, 50),
 INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
 VALUES (1, 4, 0.97),
        (2, 2, 2);
+
+-- Requête pour récuperer la liste des clients ayant acheté des pantalons (selon dates ?)
+
+-- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?) (necessite l'ajout d'un achat pour le mois precedant)
+
+-- Dépense moyenne des clients (selon dates ?, selon type de vetements ?, selon categorie client ?)
+
 
 SELECT *
 FROM Benne_collecte;
