@@ -15,27 +15,27 @@ DROP TABLE IF EXISTS Type_vetement;
 DROP TABLE IF EXISTS Benne_collecte;
 
 CREATE TABLE Benne_collecte(
-   id_benne INT AUTO_INCREMENT,
+   id_benne INT NOT NULL AUTO_INCREMENT,
    emplacement_benne VARCHAR(50),
    distance_magasin INT,
    PRIMARY KEY(id_benne)
 );
 
 CREATE TABLE Type_vetement(
-   id_type INT AUTO_INCREMENT,
+   id_type INT NOT NULL AUTO_INCREMENT,
    libelle_type VARCHAR(50),
    prix_kg_type DECIMAL(15,2),
    PRIMARY KEY(id_type)
 );
 
 CREATE TABLE Categorie_client(
-   id_categorie INT AUTO_INCREMENT,
+   id_categorie INT NOT NULL AUTO_INCREMENT,
    libelle_categorie VARCHAR(50),
    PRIMARY KEY(id_categorie)
 );
 
 CREATE TABLE Reduction(
-   id_reduction INT AUTO_INCREMENT,
+   id_reduction INT NOT NULL AUTO_INCREMENT,
    valeur_reduction INT,
    id_type INT NOT NULL,
    id_categorie INT NOT NULL,
@@ -45,13 +45,13 @@ CREATE TABLE Reduction(
 );
 
 CREATE TABLE Ramassage(
-   id_ramassage INT AUTO_INCREMENT,
+   id_ramassage INT NOT NULL AUTO_INCREMENT,
    date_ramassage DATE,
    PRIMARY KEY(id_ramassage)
 );
 
 CREATE TABLE Client(
-   id_client INT AUTO_INCREMENT,
+   id_client INT NOT NULL AUTO_INCREMENT,
    nom_client VARCHAR(50),
    tel_client VARCHAR(50),
    adresse_client VARCHAR(50),
@@ -63,7 +63,7 @@ CREATE TABLE Client(
 );
 
 CREATE TABLE Achat(
-   id_achat INT AUTO_INCREMENT,
+   id_achat INT NOT NULL AUTO_INCREMENT,
    date_achat DATE,
    prix_total DECIMAL(19,4),
    id_client INT NOT NULL,
