@@ -142,31 +142,72 @@ VALUES (1, 'poids plume'),
        (4, 'méga lourd');
 
 INSERT INTO Reduction (id_reduction, valeur_reduction, id_type, id_categorie)
-VALUES (NULL, 0, 1, 1),(NULL, 0, 2, 1),(NULL, 0, 3, 1),
-       (NULL, 2, 1, 2),(NULL, 4, 2, 2),(NULL, 5, 3, 2),
-       (NULL, 5, 1, 3),(NULL, 7, 2, 3),(NULL, 10, 3, 3),
-       (NULL, 10, 1, 4),(NULL, 14, 2, 4),(NULL, 20, 3, 4);
+VALUES (1, 0, 1, 1),
+       (2, 0, 2, 1),
+       (3, 0, 3, 1),
+       (4, 2, 1, 2),
+       (5, 4, 2, 2),
+       (6, 5, 3, 2),
+       (7, 5, 1, 3),
+       (8, 7, 2, 3),
+       (9, 10, 3, 3),
+       (10, 10, 1, 4),
+       (11, 14, 2, 4),
+       (12, 20, 3, 4);
 
 INSERT INTO Ramassage (id_ramassage, date_ramassage)
-VALUES (NULL, '2024-11-04'),
-       (NULL,'2024-10-28');
+VALUES (1, '2024-11-04'),
+       (2, '2024-10-28');
 
 INSERT INTO Client (id_client, nom_client, tel_client, adresse_client, email_client, date_naissace_client, id_categorie)
-VALUES (1, 'DOE Jane', '0693333401','31 chemin des chevaliers', 'janedoe@outlook.com','2001-01-01',1),
-       (2, 'DUPOND Nicolas', '0692028077','1 boulevard richelieu', 'dupondnicolas@gmail.com','1997-05-15', 2);
+VALUES (1, 'DOE Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
+       (2, 'DUPOND Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
 
 
 INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
-VALUES (NULL, '2024-10-28',15.5,2),
-       (NULL,'2024-11-04',5,1);
+VALUES (1, '2024-10-28', 15.5, 2),
+       (2, '2024-11-04', 25, 1);
 
-SELECT * FROM Benne_collecte;
-SELECT * FROM Type_vetement;
-SELECT * FROM Categorie_client;
-SELECT * FROM Reduction;
-SELECT * FROM Ramassage;
-SELECT * FROM Client;
-SELECT * FROM Achat;
+INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
+VALUES (1, 2, 2100),
+       (1, 3, 1050),
+       (2, 3, 3000);
 
+INSERT INTO Recolte (id_benne, id_ramassage)
+VALUES (1, 1),
+       (2, 1),
+       (3, 2);
+
+INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
+VALUES (1, 1, 50),
+       (2, 1, 74),
+       (3, 2, 34);
+
+INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
+VALUES (1, 4, 0.97),
+       (2, 2, 2);
+
+SELECT *
+FROM Benne_collecte;
+SELECT *
+FROM Type_vetement;
+SELECT *
+FROM Categorie_client;
+SELECT *
+FROM Reduction;
+SELECT *
+FROM Ramassage;
+SELECT *
+FROM Client;
+SELECT *
+FROM Achat;
+SELECT *
+FROM Distance_entre_benne;
+SELECT *
+FROM Recolte;
+SELECT *
+FROM Tri;
+SELECT *
+FROM Concerne;
 SHOW TABLES;
 
