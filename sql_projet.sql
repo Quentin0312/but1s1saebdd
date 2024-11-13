@@ -61,9 +61,11 @@ CREATE TABLE Ramassage
 CREATE TABLE Client
 (
     id_client            INT NOT NULL AUTO_INCREMENT,
+#     nom complet et non com et prenom ?
     nom_client           VARCHAR(50),
 #     Taille max numéro de tél ?
     tel_client           VARCHAR(50),
+#     Ajouter code postal dans les adresse ? et aussi bennes !!
     adresse_client       VARCHAR(50),
     email_client         VARCHAR(50),
     date_naissace_client DATE,
@@ -145,10 +147,26 @@ VALUES (NULL, 0, 1, 1),(NULL, 0, 2, 1),(NULL, 0, 3, 1),
        (NULL, 5, 1, 3),(NULL, 7, 2, 3),(NULL, 10, 3, 3),
        (NULL, 10, 1, 4),(NULL, 14, 2, 4),(NULL, 20, 3, 4);
 
+INSERT INTO Ramassage (id_ramassage, date_ramassage)
+VALUES (NULL, '2024-11-04'),
+       (NULL,'2024-10-28');
+
+INSERT INTO Client (id_client, nom_client, tel_client, adresse_client, email_client, date_naissace_client, id_categorie)
+VALUES (1, 'DOE Jane', '0693333401','31 chemin des chevaliers', 'janedoe@outlook.com','2001-01-01',1),
+       (2, 'DUPOND Nicolas', '0692028077','1 boulevard richelieu', 'dupondnicolas@gmail.com','1997-05-15', 2);
+
+
+INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
+VALUES (NULL, '2024-10-28',15.5,2),
+       (NULL,'2024-11-04',5,1);
+
 SELECT * FROM Benne_collecte;
 SELECT * FROM Type_vetement;
 SELECT * FROM Categorie_client;
 SELECT * FROM Reduction;
+SELECT * FROM Ramassage;
+SELECT * FROM Client;
+SELECT * FROM Achat;
 
 SHOW TABLES;
 
