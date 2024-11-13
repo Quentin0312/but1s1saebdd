@@ -42,6 +42,7 @@ CREATE TABLE Categorie_client
 CREATE TABLE Reduction
 (
     id_reduction     INT NOT NULL AUTO_INCREMENT,
+#     Correspond à un pourcentage ? Renommer pourcentage_reduction et appliquer les modifs (dans les inserts !?)
     valeur_reduction INT,
     id_type          INT NOT NULL,
     id_categorie     INT NOT NULL,
@@ -122,4 +123,32 @@ CREATE TABLE Concerne
     FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
 );
 
+INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
+VALUES (1, '1 rue gaston defferre', 2000),
+       (2, '2 rue ernest duvillard', 500),
+       (3, '3 rue marcel paul', 2100);
+
+INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
+VALUES (1, 't-shirt', 20),
+       (2, 'pantalon', 25),
+       (3, 'robe', 40);
+
+INSERT INTO Categorie_client (id_categorie, libelle_categorie)
+VALUES (1, 'poids plume'),
+       (2, 'léger'),
+       (3, 'lourd'),
+       (4, 'méga lourd');
+
+INSERT INTO Reduction (id_reduction, valeur_reduction, id_type, id_categorie)
+VALUES (NULL, 0, 1, 1),(NULL, 0, 2, 1),(NULL, 0, 3, 1),
+       (NULL, 2, 1, 2),(NULL, 4, 2, 2),(NULL, 5, 3, 2),
+       (NULL, 5, 1, 3),(NULL, 7, 2, 3),(NULL, 10, 3, 3),
+       (NULL, 10, 1, 4),(NULL, 14, 2, 4),(NULL, 20, 3, 4);
+
+SELECT * FROM Benne_collecte;
+SELECT * FROM Type_vetement;
+SELECT * FROM Categorie_client;
+SELECT * FROM Reduction;
+
 SHOW TABLES;
+
