@@ -234,30 +234,30 @@ SET prix_total = (SELECT SUM(Type_vetement.prix_kg_type * Concerne.poids_type_ve
 WHERE Achat.prix_total IS NULL;
 
 
--- Requête pour récuperer la liste des clients ayant acheté des pantalons durant une certaine periode (validé)
-# SELECT Achat.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
-# FROM Achat
-#          LEFT JOIN Client on Achat.id_client = Client.id_client
-#          RIGHT JOIN Concerne on Achat.id_achat = Concerne.id_achat
-# WHERE Concerne.id_type = 2
-#   AND MONTH(Achat.date_achat) = 10
-#   AND YEAR(Achat.date_achat) = 2024;
-
+-- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024 (validé)
 SELECT sous_requete.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
 FROM (SELECT Achat.id_client AS id_client
       FROM Concerne
                JOIN Achat ON Concerne.id_achat = Achat.id_achat
       WHERE Concerne.id_type = 2
-#         AND Achat.date_achat = '2024-10-%'
         AND MONTH(Achat.date_achat) = 10
         AND YEAR(Achat.date_achat) = 2024
       GROUP BY Achat.id_client) AS sous_requete
          JOIN Client ON sous_requete.id_client = Client.id_client;
 
+-- Pour un ramassage donné, afficher le poids trié selon les types de vetements (validé)
+SELECT Type_vetement.libelle_type, sous_requete.poids_total
+FROM (SELECT Tri.id_type AS id_type, SUM(Tri.poids_type_trie) AS poids_total
+      FROM Tri
+      WHERE Tri.id_ramassage = 1
+      GROUP BY Tri.id_type) AS sous_requete
+         JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type;
+-- TODO : Verifier !!!!!!!!!!!!!!!!!!!!!!!
+
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
-SELECT SUM(prix_total) AS total_ventes_du_mois
-FROM Achat
-WHERE date_achat BETWEEN '2024-10-01' AND '2024-10-31';
+# SELECT SUM(prix_total) AS total_ventes_du_mois
+# FROM Achat
+# WHERE date_achat BETWEEN '2024-10-01' AND '2024-10-31';
 # WHERE date_achat BETWEEN DATE_SUB(curdate(), INTERVAL 1 MONTH) AND '2024-10-31';
 # WHERE MONTH(date_achat) = MONTH(DATE_SUB(CURDATE(), interval 1 MONTH));
 -- Volume de ventes pour chaque types de vetements
@@ -275,13 +275,6 @@ WHERE date_achat BETWEEN '2024-10-01' AND '2024-10-31';
 
 -- Chaque type de vetements (+poids) et reduction par achat (validé)
 
-
--- Poids trié par categorie de vetements selon un ramassage (validé)
-SELECT Tri.id_type, SUM(Tri.poids_type_trie)
-FROM Tri
-         JOIN Ramassage on Tri.id_ramassage = Ramassage.id_ramassage
-WHERE Ramassage.id_ramassage = 1
-GROUP BY Tri.id_type;
 -- Distance total parcouru par rammassage (validé)
 # SELECT id_benne FROM Recolte JOIN Distance_entre_benne ON  WHERE id_ramassage = 1;
 
