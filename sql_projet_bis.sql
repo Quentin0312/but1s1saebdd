@@ -200,16 +200,17 @@ FROM (SELECT Achat.id_client AS id_client
       FROM Concerne
                JOIN Achat ON Concerne.id_achat = Achat.id_achat
       WHERE Concerne.id_type = 2
+#         AND Achat.date_achat = '2024-10-%'
         AND MONTH(Achat.date_achat) = 10
         AND YEAR(Achat.date_achat) = 2024
       GROUP BY Achat.id_client) AS sous_requete
          JOIN Client ON sous_requete.id_client = Client.id_client;
 
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
+
+-- Volume de ventes pour chaque types de vetements
 -- TODO : Ajouter les données necessaire et vérifier
 
--- Volume de ventes pour chauqe types de vetements
--- TODO : Ajouter les données necessaire et vérifier
 
 -- Réduction moyenne selon la catégorie client
 -- TODO : Ajouter les données necessaire et vérifier
@@ -223,11 +224,14 @@ FROM (SELECT Achat.id_client AS id_client
 -- Chaque type de vetements (+poids) et reduction par achat (validé)
 
 
--- Poids trié par categorire de vetements selon un ramassage (validé)
-
-
+-- Poids trié par categorie de vetements selon un ramassage (validé)
+SELECT Tri.id_type, SUM(Tri.poids_type_trie)
+FROM Tri
+         JOIN Ramassage on Tri.id_ramassage = Ramassage.id_ramassage
+WHERE Ramassage.id_ramassage = 1
+GROUP BY Tri.id_type;
 -- Distance total parcouru par rammassage (validé)
-
+# SELECT id_benne FROM Recolte JOIN Distance_entre_benne ON  WHERE id_ramassage = 1;
 
 # SELECT *
 # FROM Benne_collecte;
