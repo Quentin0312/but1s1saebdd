@@ -195,7 +195,15 @@ CREATE TABLE Concerne
 #   AND MONTH(Achat.date_achat) = 10
 #   AND YEAR(Achat.date_achat) = 2024;
 
-SELECT * FROM Concerne WHERE id_type = 2;
+SELECT sous_requete.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
+FROM (SELECT Achat.id_client AS id_client
+      FROM Concerne
+               JOIN Achat ON Concerne.id_achat = Achat.id_achat
+      WHERE Concerne.id_type = 2
+        AND MONTH(Achat.date_achat) = 10
+        AND YEAR(Achat.date_achat) = 2024
+      GROUP BY Achat.id_client) AS sous_requete
+         JOIN Client ON sous_requete.id_client = Client.id_client;
 
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
 -- TODO : Ajouter les données necessaire et vérifier
