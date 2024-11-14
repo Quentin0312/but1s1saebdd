@@ -122,69 +122,117 @@ CREATE TABLE Concerne
     FOREIGN KEY (id_achat) REFERENCES Achat (id_achat)
 );
 
-#
-# INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
-# VALUES (1, '1 rue gaston defferre', 2000),
-#        (2, '2 rue ernest duvillard', 500),
-#        (3, '3 rue marcel paul', 2100);
-#
-# INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
-# VALUES (1, 't-shirt', 20),
-#        (2, 'pantalon', 25),
-#        (3, 'robe', 40);
-#
-# INSERT INTO Categorie_client (id_categorie, libelle_categorie)
-# VALUES (1, 'poids plume'),
-#        (2, 'léger'),
-#        (3, 'lourd'),
-#        (4, 'méga lourd');
-#
-# INSERT INTO Reduction (id_reduction, valeur_reduction, id_type, id_categorie)
-# VALUES (1, 0, 1, 1),
-#        (2, 0, 2, 1),
-#        (3, 0, 3, 1),
-#        (4, 2, 1, 2),
-#        (5, 4, 2, 2),
-#        (6, 5, 3, 2),
-#        (7, 5, 1, 3),
-#        (8, 7, 2, 3),
-#        (9, 10, 3, 3),
-#        (10, 10, 1, 4),
-#        (11, 14, 2, 4),
-#        (12, 20, 3, 4);
-#
-# INSERT INTO Ramassage (id_ramassage, date_ramassage)
-# VALUES (1, '2024-11-04'),
-#        (2, '2024-10-28');
-#
-# INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
-#                     date_naissace_client, id_categorie)
-# VALUES (1, 'DOE', 'Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
-#        (2, 'DUPOND', 'Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
-#
-#
-# INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
-# VALUES (1, '2024-11-04', 15.5, 2),
-#        (2, '2024-11-07', 25, 1);
-#
-# INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
-# VALUES (1, 2, 2100),
-#        (1, 3, 1050),
-#        (2, 3, 3000);
-#
-# INSERT INTO Recolte (id_benne, id_ramassage)
-# VALUES (1, 1),
-#        (2, 1),
-#        (3, 2);
-#
-# INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
-# VALUES (1, 1, 50),
-#        (2, 1, 74),
-#        (3, 2, 34);
-#
-# INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
-# VALUES (1, 4, 0.97),
-#        (2, 2, 2);
+-- INSERTs de base
+INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
+VALUES (1, '1 rue gaston defferre', 2000),
+       (2, '2 rue ernest duvillard', 500),
+       (3, '3 rue marcel paul', 2100);
+
+INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
+VALUES (1, 't-shirt', 20),
+       (2, 'pantalon', 25),
+       (3, 'robe', 40),
+       (4, 'chemise', 30),
+       (5, 'jupe', 35),
+       (6, 'veste', 50);
+
+INSERT INTO Categorie_client (id_categorie, libelle_categorie)
+VALUES (1, 'poids plume'),
+       (2, 'léger'),
+       (3, 'lourd'),
+       (4, 'méga lourd');
+
+INSERT INTO Ramassage (id_ramassage, date_ramassage)
+VALUES (1, '2024-11-04'),
+       (2, '2024-10-28');
+
+INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
+VALUES (1, 2, 2100),
+       (1, 3, 1050),
+       (2, 3, 3000);
+
+INSERT INTO Recolte (id_benne, id_ramassage)
+VALUES (1, 1),
+       (2, 1),
+       (3, 2);
+
+INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
+VALUES (1, 1, 50),
+       (2, 1, 74),
+       (3, 2, 34);
+
+-- INSERTs pour la série de Tests/SELECTs
+INSERT INTO Client (nom_client, prenom_client, tel_client, adresse_client, email_client, date_naissace_client,
+                    id_categorie)
+VALUES ('MARTIN', 'Elise', '0692123456', '15 avenue des lilas', 'elise.martin@gmail.com', '1985-02-12', 2),
+       ('ROBERT', 'Paul', '0692987654', '10 rue du temple', 'paul.robert@yahoo.com', '1992-09-23', 3),
+       ('LOPEZ', 'Marie', '0692334455', '8 rue de la paix', 'marie.lopez@gmail.com', '1990-07-20', 3),
+       ('SIMON', 'Alex', '0692445566', '45 boulevard du sud', 'alex.simon@hotmail.com', '1988-10-12', 4),
+       ('DUPONT', 'Jean', '0692556677', '22 rue de la liberté', 'jean.dupont@gmail.com', '1980-05-15', 2),
+       ('DURAND', 'Sophie', '0692667788', '33 avenue de la république', 'sophie.durand@yahoo.com', '1995-11-25', 3),
+       ('LEFEVRE', 'Pierre', '0692778899', '44 boulevard de la paix', 'pierre.lefevre@hotmail.com', '1987-03-10', 4),
+       ('MOREAU', 'Claire', '0692889900', '55 rue de la victoire', 'claire.moreau@gmail.com', '1991-08-20', 2),
+       ('FOURNIER', 'Luc', '0692990011', '66 avenue de la liberté', 'luc.fournier@yahoo.com', '1983-04-15', 3),
+       ('BERTRAND', 'Anne', '0692001122', '77 boulevard de la république', 'anne.bertrand@hotmail.com', '1994-12-05',
+        4),
+       ('ROUX', 'Michel', '0692112233', '88 rue de la paix', 'michel.roux@gmail.com', '1981-06-30', 2);
+
+
+INSERT INTO Achat (date_achat, prix_total, id_client)
+VALUES ('2024-10-01', NULL, 3),
+       ('2024-09-01', NULL, 4),
+       ('2024-10-15', NULL, 5),
+       ('2024-10-10', NULL, 6),
+       ('2024-09-20', NULL, 3),
+       ('2024-10-15', NULL, 9),
+       ('2024-10-15', NULL, 10),
+       ('2024-09-30', NULL, 11),
+       ('2024-08-20', NULL, 5),
+       ('2024-08-10', NULL, 2),
+       ('2024-07-01', NULL, 9);
+
+
+INSERT INTO Concerne (id_type, id_achat, poids_type_vetement)
+VALUES (1, 10, 1.8),
+       (2, 9, 2.0),
+       (2, 4, 2.0),
+       (1, 3, 1.5),
+       (2, 1, 1.2),
+       (3, 10, 2.5),
+       (2, 11, 3.0),
+       (1, 9, 1.2),
+       (1, 5, 1.0),
+       (2, 7, 3.0),
+       (3, 8, 2.0),
+       (1, 6, 2.5),
+       (2, 2, 1.8),
+       (4, 1, 1.5), -- Chemise
+       (5, 3, 2.0), -- Jupe
+       (6, 5, 1.8);
+
+INSERT INTO Reduction (id_type, id_categorie, valeur_reduction)
+VALUES (2, 2, 3),
+       (1, 1, 3),  -- Réduction pour catégorie "poids plume"
+       (2, 1, 5),
+       (1, 2, 7),  -- Réduction pour catégorie "léger"
+       (3, 2, 12),
+       (1, 3, 15), -- Réduction pour catégorie "lourd"
+       (2, 3, 20),
+       (3, 3, 25),
+       (1, 4, 30), -- Réduction pour catégorie "méga lourd"
+       (2, 4, 35),
+       (3, 4, 40),
+       (4, 2, 5),  -- Réduction pour chemise
+       (5, 3, 10), -- Réduction pour jupe
+       (6, 4, 15); -- Réduction pour veste
+
+UPDATE Achat
+SET prix_total = (SELECT SUM(Type_vetement.prix_kg_type * Concerne.poids_type_vetement)
+                  FROM Concerne
+                           JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
+                  WHERE Concerne.id_achat = Achat.id_achat)
+WHERE Achat.prix_total IS NULL;
+
 
 -- Requête pour récuperer la liste des clients ayant acheté des pantalons durant une certaine periode (validé)
 # SELECT Achat.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
@@ -207,7 +255,11 @@ FROM (SELECT Achat.id_client AS id_client
          JOIN Client ON sous_requete.id_client = Client.id_client;
 
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
-
+SELECT SUM(prix_total) AS total_ventes_du_mois
+FROM Achat
+WHERE date_achat BETWEEN '2024-10-01' AND '2024-10-31';
+# WHERE date_achat BETWEEN DATE_SUB(curdate(), INTERVAL 1 MONTH) AND '2024-10-31';
+# WHERE MONTH(date_achat) = MONTH(DATE_SUB(CURDATE(), interval 1 MONTH));
 -- Volume de ventes pour chaque types de vetements
 -- TODO : Ajouter les données necessaire et vérifier
 
