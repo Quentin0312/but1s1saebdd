@@ -192,34 +192,57 @@ INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
 VALUES (1, 4, 0.97),
        (2, 2, 2);
 
--- Requête pour récuperer la liste des clients ayant acheté des pantalons (selon dates ?)
+-- Requête pour récuperer la liste des clients ayant acheté des pantalons durant le mois precedant
+-- TODO : Ajouter les données necessaire et vérifier !
+SELECT DISTINCT Achat.id_client, Client.nom_client
+FROM Achat
+         LEFT JOIN Client on Achat.id_client = Client.id_client
+         RIGHT JOIN Concerne on Achat.id_achat = Concerne.id_achat
+         LEFT JOIN Reduction on Concerne.id_reduction = Reduction.id_reduction
+WHERE Reduction.id_type = 2;
+
+-- TODO : Vérifier le problème du GROUP BY qui doit pas passer !
+-- SELECT AVG(Reduction.valeur_reduction) FROM Reduction;
 
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?) (necessite l'ajout d'un achat pour le mois precedant)
+-- TODO : Ajouter les données necessaire et vérifier
+
 
 -- Dépense moyenne des clients (selon dates ?, selon type de vetements ?, selon categorie client ?)
+-- TODO : Ajouter les données necessaire et vérifier
+
+-- Réduction moyenne selon la catégorie client
+-- TODO : Ajouter les données necessaire et vérifier
+SELECT sous_requete.reduction_moyenne, Categorie_client.libelle_categorie
+FROM (SELECT AVG(Reduction.valeur_reduction) AS reduction_moyenne, Reduction.id_categorie
+      FROM Reduction
+      GROUP BY Reduction.id_categorie) AS sous_requete
+         LEFT JOIN Categorie_client ON sous_requete.id_categorie = Categorie_client.id_categorie
+ORDER BY sous_requete.reduction_moyenne;
 
 
-SELECT *
-FROM Benne_collecte;
-SELECT *
-FROM Type_vetement;
-SELECT *
-FROM Categorie_client;
-SELECT *
-FROM Reduction;
-SELECT *
-FROM Ramassage;
-SELECT *
-FROM Client;
-SELECT *
-FROM Achat;
-SELECT *
-FROM Distance_entre_benne;
-SELECT *
-FROM Recolte;
-SELECT *
-FROM Tri;
-SELECT *
-FROM Concerne;
-SHOW TABLES;
+
+# SELECT *
+# FROM Benne_collecte;
+# SELECT *
+# FROM Type_vetement;
+# SELECT *
+# FROM Categorie_client;
+# SELECT *
+# FROM Reduction;
+# SELECT *
+# FROM Ramassage;
+# SELECT *
+# FROM Client;
+# SELECT *
+# FROM Achat;
+# SELECT *
+# FROM Distance_entre_benne;
+# SELECT *
+# FROM Recolte;
+# SELECT *
+# FROM Tri;
+# SELECT *
+# FROM Concerne;
+# SHOW TABLES;
 
