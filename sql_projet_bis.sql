@@ -10,12 +10,11 @@
 DROP TABLE IF EXISTS Concerne;
 DROP TABLE IF EXISTS Tri;
 DROP TABLE IF EXISTS Recolte;
-DROP TABLE IF EXISTS Octroi;
+DROP TABLE IF EXISTS Reduction;
 DROP TABLE IF EXISTS Distance_entre_benne;
 DROP TABLE IF EXISTS Achat;
 DROP TABLE IF EXISTS Client;
 DROP TABLE IF EXISTS Ramassage;
-DROP TABLE IF EXISTS Reduction;
 DROP TABLE IF EXISTS Categorie_client;
 DROP TABLE IF EXISTS Type_vetement;
 DROP TABLE IF EXISTS Benne_collecte;
@@ -41,23 +40,6 @@ CREATE TABLE Categorie_client
     id_categorie      INT NOT NULL AUTO_INCREMENT,
     libelle_categorie VARCHAR(50),
     PRIMARY KEY (id_categorie)
-);
-
-# CREATE TABLE Reduction
-# (
-#     id_reduction     INT NOT NULL AUTO_INCREMENT,
-#     valeur_reduction INT,
-#     id_type          INT NOT NULL,
-#     id_categorie     INT NOT NULL,
-#     PRIMARY KEY (id_reduction),
-#     FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-#     FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
-# );
-
-CREATE TABLE Reduction(
-   id_reduction INT AUTO_INCREMENT,
-   valeur_reduction INT,
-   PRIMARY KEY(id_reduction)
 );
 
 CREATE TABLE Ramassage
@@ -101,12 +83,14 @@ CREATE TABLE Distance_entre_benne
     FOREIGN KEY (id_benne_2) REFERENCES Benne_collecte (id_benne)
 );
 
-CREATE TABLE Octroie(
-   id_categorie INT,
-   id_reduction INT,
-   PRIMARY KEY(id_categorie, id_reduction),
-   FOREIGN KEY(id_categorie) REFERENCES Categorie_client(id_categorie),
-   FOREIGN KEY(id_reduction) REFERENCES Reduction(id_reduction)
+CREATE TABLE Reduction
+(
+    id_type          INT,
+    id_categorie     INT,
+    valeur_reduction INT,
+    PRIMARY KEY (id_type, id_categorie),
+    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+    FOREIGN KEY (id_catégorie) REFERENCES Categorie_client (id_categorie)
 );
 
 CREATE TABLE Recolte
@@ -128,25 +112,15 @@ CREATE TABLE Tri
     FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
 );
 
-# CREATE TABLE Concerne
-# (
-#     id_achat           INT,
-#     id_reduction       INT,
-#     poid_type_vetement DECIMAL(4, 2),
-#     PRIMARY KEY (id_achat, id_reduction),
-#     FOREIGN KEY (id_achat) REFERENCES Achat (id_achat),
-#     FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
-# );
-
-CREATE TABLE Concerne(
-   id_type INT,
-   id_achat INT,
-   id_reduction INT,
-   poids_type_vetement DECIMAL(4,2),
-   PRIMARY KEY(id_type, id_achat, id_reduction),
-   FOREIGN KEY(id_type) REFERENCES Type_vetement(id_type),
-   FOREIGN KEY(id_achat) REFERENCES Achat(id_achat),
-   FOREIGN KEY(id_reduction) REFERENCES Reduction(id_reduction)
+CREATE TABLE Concerne
+(
+    id_type             INT,
+    id_achat            INT,
+    poids_type_vetement DECIMAL(4, 2),
+    PRIMARY KEY (id_type, id_achat),
+    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+    FOREIGN KEY (id_achat) REFERENCES Achat (id_achat),
+    FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
 );
 
 
@@ -184,9 +158,10 @@ INSERT INTO Ramassage (id_ramassage, date_ramassage)
 VALUES (1, '2024-11-04'),
        (2, '2024-10-28');
 
-INSERT INTO Client (id_client, nom_client,prenom_client, tel_client, adresse_client, email_client, date_naissace_client, id_categorie)
-VALUES (1, 'DOE', 'Jane','0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
-       (2, 'DUPOND','Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
+INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
+                    date_naissace_client, id_categorie)
+VALUES (1, 'DOE', 'Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
+       (2, 'DUPOND', 'Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
 
 
 INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
@@ -212,23 +187,19 @@ INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
 VALUES (1, 4, 0.97),
        (2, 2, 2);
 
--- Requête pour récuperer la liste des clients ayant acheté des pantalons durant le mois precedant
--- TODO : Ajouter les données necessaire et vérifier !
+-- Requête pour récuperer la liste des clients ayant acheté des pantalons durant une certaine periode (validé)
 SELECT DISTINCT Achat.id_client, Client.nom_client
 FROM Achat
          LEFT JOIN Client on Achat.id_client = Client.id_client
          RIGHT JOIN Concerne on Achat.id_achat = Concerne.id_achat
          LEFT JOIN Reduction on Concerne.id_reduction = Reduction.id_reduction
 WHERE Reduction.id_type = 2;
+-- => Ajouter la date
 
--- TODO : Vérifier le problème du GROUP BY qui doit pas passer !
--- SELECT AVG(Reduction.valeur_reduction) FROM Reduction;
-
--- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?) (necessite l'ajout d'un achat pour le mois precedant)
+-- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
 -- TODO : Ajouter les données necessaire et vérifier
 
-
--- Dépense moyenne des clients (selon dates ?, selon type de vetements ?, selon categorie client ?)
+-- Volume de ventes pour chauqe types de vetements
 -- TODO : Ajouter les données necessaire et vérifier
 
 -- Réduction moyenne selon la catégorie client
@@ -240,6 +211,13 @@ FROM (SELECT AVG(Reduction.valeur_reduction) AS reduction_moyenne, Reduction.id_
          LEFT JOIN Categorie_client ON sous_requete.id_categorie = Categorie_client.id_categorie
 ORDER BY sous_requete.reduction_moyenne;
 
+-- Chaque type de vetements (+poids) et reduction par achat (validé)
+
+
+-- Poids trié par categorire de vetements selon un ramassage (validé)
+
+
+-- Distance total parcouru par rammassage (validé)
 
 
 # SELECT *
