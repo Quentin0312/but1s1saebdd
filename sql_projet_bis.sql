@@ -10,6 +10,7 @@
 DROP TABLE IF EXISTS Concerne;
 DROP TABLE IF EXISTS Tri;
 DROP TABLE IF EXISTS Recolte;
+DROP TABLE IF EXISTS Octroi;
 DROP TABLE IF EXISTS Distance_entre_benne;
 DROP TABLE IF EXISTS Achat;
 DROP TABLE IF EXISTS Client;
@@ -22,7 +23,7 @@ DROP TABLE IF EXISTS Benne_collecte;
 CREATE TABLE Benne_collecte
 (
     id_benne          INT NOT NULL AUTO_INCREMENT,
-    emplacement_benne VARCHAR(50),
+    emplacement_benne VARCHAR(100),
     distance_magasin  INT,
     PRIMARY KEY (id_benne)
 );
@@ -31,7 +32,7 @@ CREATE TABLE Type_vetement
 (
     id_type      INT NOT NULL AUTO_INCREMENT,
     libelle_type VARCHAR(50),
-    prix_kg_type DECIMAL(4, 2),
+    prix_kg_type DECIMAL(6, 2),
     PRIMARY KEY (id_type)
 );
 
@@ -42,15 +43,21 @@ CREATE TABLE Categorie_client
     PRIMARY KEY (id_categorie)
 );
 
-CREATE TABLE Reduction
-(
-    id_reduction     INT NOT NULL AUTO_INCREMENT,
-    valeur_reduction INT,
-    id_type          INT NOT NULL,
-    id_categorie     INT NOT NULL,
-    PRIMARY KEY (id_reduction),
-    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
+# CREATE TABLE Reduction
+# (
+#     id_reduction     INT NOT NULL AUTO_INCREMENT,
+#     valeur_reduction INT,
+#     id_type          INT NOT NULL,
+#     id_categorie     INT NOT NULL,
+#     PRIMARY KEY (id_reduction),
+#     FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+#     FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
+# );
+
+CREATE TABLE Reduction(
+   id_reduction INT AUTO_INCREMENT,
+   valeur_reduction INT,
+   PRIMARY KEY(id_reduction)
 );
 
 CREATE TABLE Ramassage
@@ -94,6 +101,14 @@ CREATE TABLE Distance_entre_benne
     FOREIGN KEY (id_benne_2) REFERENCES Benne_collecte (id_benne)
 );
 
+CREATE TABLE Octroie(
+   id_categorie INT,
+   id_reduction INT,
+   PRIMARY KEY(id_categorie, id_reduction),
+   FOREIGN KEY(id_categorie) REFERENCES Categorie_client(id_categorie),
+   FOREIGN KEY(id_reduction) REFERENCES Reduction(id_reduction)
+);
+
 CREATE TABLE Recolte
 (
     id_benne     INT,
@@ -113,15 +128,27 @@ CREATE TABLE Tri
     FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
 );
 
-CREATE TABLE Concerne
-(
-    id_achat           INT,
-    id_reduction       INT,
-    poid_type_vetement DECIMAL(4, 2),
-    PRIMARY KEY (id_achat, id_reduction),
-    FOREIGN KEY (id_achat) REFERENCES Achat (id_achat),
-    FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
+# CREATE TABLE Concerne
+# (
+#     id_achat           INT,
+#     id_reduction       INT,
+#     poid_type_vetement DECIMAL(4, 2),
+#     PRIMARY KEY (id_achat, id_reduction),
+#     FOREIGN KEY (id_achat) REFERENCES Achat (id_achat),
+#     FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
+# );
+
+CREATE TABLE Concerne(
+   id_type INT,
+   id_achat INT,
+   id_reduction INT,
+   poids_type_vetement DECIMAL(4,2),
+   PRIMARY KEY(id_type, id_achat, id_reduction),
+   FOREIGN KEY(id_type) REFERENCES Type_vetement(id_type),
+   FOREIGN KEY(id_achat) REFERENCES Achat(id_achat),
+   FOREIGN KEY(id_reduction) REFERENCES Reduction(id_reduction)
 );
+
 
 INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
 VALUES (1, '1 rue gaston defferre', 2000),
