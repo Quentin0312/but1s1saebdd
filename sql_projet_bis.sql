@@ -90,7 +90,7 @@ CREATE TABLE Reduction
     valeur_reduction INT,
     PRIMARY KEY (id_type, id_categorie),
     FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_catégorie) REFERENCES Categorie_client (id_categorie)
+    FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
 );
 
 CREATE TABLE Recolte
@@ -119,82 +119,83 @@ CREATE TABLE Concerne
     poids_type_vetement DECIMAL(4, 2),
     PRIMARY KEY (id_type, id_achat),
     FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_achat) REFERENCES Achat (id_achat),
-    FOREIGN KEY (id_reduction) REFERENCES Reduction (id_reduction)
+    FOREIGN KEY (id_achat) REFERENCES Achat (id_achat)
 );
 
-
-INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
-VALUES (1, '1 rue gaston defferre', 2000),
-       (2, '2 rue ernest duvillard', 500),
-       (3, '3 rue marcel paul', 2100);
-
-INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
-VALUES (1, 't-shirt', 20),
-       (2, 'pantalon', 25),
-       (3, 'robe', 40);
-
-INSERT INTO Categorie_client (id_categorie, libelle_categorie)
-VALUES (1, 'poids plume'),
-       (2, 'léger'),
-       (3, 'lourd'),
-       (4, 'méga lourd');
-
-INSERT INTO Reduction (id_reduction, valeur_reduction, id_type, id_categorie)
-VALUES (1, 0, 1, 1),
-       (2, 0, 2, 1),
-       (3, 0, 3, 1),
-       (4, 2, 1, 2),
-       (5, 4, 2, 2),
-       (6, 5, 3, 2),
-       (7, 5, 1, 3),
-       (8, 7, 2, 3),
-       (9, 10, 3, 3),
-       (10, 10, 1, 4),
-       (11, 14, 2, 4),
-       (12, 20, 3, 4);
-
-INSERT INTO Ramassage (id_ramassage, date_ramassage)
-VALUES (1, '2024-11-04'),
-       (2, '2024-10-28');
-
-INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
-                    date_naissace_client, id_categorie)
-VALUES (1, 'DOE', 'Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
-       (2, 'DUPOND', 'Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
-
-
-INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
-VALUES (1, '2024-11-04', 15.5, 2),
-       (2, '2024-11-07', 25, 1);
-
-INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
-VALUES (1, 2, 2100),
-       (1, 3, 1050),
-       (2, 3, 3000);
-
-INSERT INTO Recolte (id_benne, id_ramassage)
-VALUES (1, 1),
-       (2, 1),
-       (3, 2);
-
-INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
-VALUES (1, 1, 50),
-       (2, 1, 74),
-       (3, 2, 34);
-
-INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
-VALUES (1, 4, 0.97),
-       (2, 2, 2);
+#
+# INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
+# VALUES (1, '1 rue gaston defferre', 2000),
+#        (2, '2 rue ernest duvillard', 500),
+#        (3, '3 rue marcel paul', 2100);
+#
+# INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
+# VALUES (1, 't-shirt', 20),
+#        (2, 'pantalon', 25),
+#        (3, 'robe', 40);
+#
+# INSERT INTO Categorie_client (id_categorie, libelle_categorie)
+# VALUES (1, 'poids plume'),
+#        (2, 'léger'),
+#        (3, 'lourd'),
+#        (4, 'méga lourd');
+#
+# INSERT INTO Reduction (id_reduction, valeur_reduction, id_type, id_categorie)
+# VALUES (1, 0, 1, 1),
+#        (2, 0, 2, 1),
+#        (3, 0, 3, 1),
+#        (4, 2, 1, 2),
+#        (5, 4, 2, 2),
+#        (6, 5, 3, 2),
+#        (7, 5, 1, 3),
+#        (8, 7, 2, 3),
+#        (9, 10, 3, 3),
+#        (10, 10, 1, 4),
+#        (11, 14, 2, 4),
+#        (12, 20, 3, 4);
+#
+# INSERT INTO Ramassage (id_ramassage, date_ramassage)
+# VALUES (1, '2024-11-04'),
+#        (2, '2024-10-28');
+#
+# INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
+#                     date_naissace_client, id_categorie)
+# VALUES (1, 'DOE', 'Jane', '0693333401', '31 chemin des chevaliers', 'janedoe@outlook.com', '2001-01-01', 1),
+#        (2, 'DUPOND', 'Nicolas', '0692028077', '1 boulevard richelieu', 'dupondnicolas@gmail.com', '1997-05-15', 2);
+#
+#
+# INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
+# VALUES (1, '2024-11-04', 15.5, 2),
+#        (2, '2024-11-07', 25, 1);
+#
+# INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
+# VALUES (1, 2, 2100),
+#        (1, 3, 1050),
+#        (2, 3, 3000);
+#
+# INSERT INTO Recolte (id_benne, id_ramassage)
+# VALUES (1, 1),
+#        (2, 1),
+#        (3, 2);
+#
+# INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
+# VALUES (1, 1, 50),
+#        (2, 1, 74),
+#        (3, 2, 34);
+#
+# INSERT INTO Concerne (id_achat, id_reduction, poid_type_vetement)
+# VALUES (1, 4, 0.97),
+#        (2, 2, 2);
 
 -- Requête pour récuperer la liste des clients ayant acheté des pantalons durant une certaine periode (validé)
-SELECT DISTINCT Achat.id_client, Client.nom_client
-FROM Achat
-         LEFT JOIN Client on Achat.id_client = Client.id_client
-         RIGHT JOIN Concerne on Achat.id_achat = Concerne.id_achat
-         LEFT JOIN Reduction on Concerne.id_reduction = Reduction.id_reduction
-WHERE Reduction.id_type = 2;
--- => Ajouter la date
+# SELECT Achat.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
+# FROM Achat
+#          LEFT JOIN Client on Achat.id_client = Client.id_client
+#          RIGHT JOIN Concerne on Achat.id_achat = Concerne.id_achat
+# WHERE Concerne.id_type = 2
+#   AND MONTH(Achat.date_achat) = 10
+#   AND YEAR(Achat.date_achat) = 2024;
+
+SELECT * FROM Concerne WHERE id_type = 2;
 
 -- Requête pour total de ventes de ce mois (selon dates ?, selon type de vetements ?, selon categorie client ?)
 -- TODO : Ajouter les données necessaire et vérifier
@@ -204,12 +205,12 @@ WHERE Reduction.id_type = 2;
 
 -- Réduction moyenne selon la catégorie client
 -- TODO : Ajouter les données necessaire et vérifier
-SELECT sous_requete.reduction_moyenne, Categorie_client.libelle_categorie
-FROM (SELECT AVG(Reduction.valeur_reduction) AS reduction_moyenne, Reduction.id_categorie
-      FROM Reduction
-      GROUP BY Reduction.id_categorie) AS sous_requete
-         LEFT JOIN Categorie_client ON sous_requete.id_categorie = Categorie_client.id_categorie
-ORDER BY sous_requete.reduction_moyenne;
+# SELECT sous_requete.reduction_moyenne, Categorie_client.libelle_categorie
+# FROM (SELECT AVG(Reduction.valeur_reduction) AS reduction_moyenne, Reduction.id_categorie
+#       FROM Reduction
+#       GROUP BY Reduction.id_categorie) AS sous_requete
+#          LEFT JOIN Categorie_client ON sous_requete.id_categorie = Categorie_client.id_categorie
+# ORDER BY sous_requete.reduction_moyenne;
 
 -- Chaque type de vetements (+poids) et reduction par achat (validé)
 
