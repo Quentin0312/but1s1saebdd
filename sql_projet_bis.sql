@@ -1,12 +1,3 @@
-# Règles de nommage
-# https://sql.sh/1396-nom-table-colonne
-# TODO :
-# - [x] Discuter des commentaires présent dans le script
-# - Enrichir le jeu de test selon les requêtes voulues (besoin d'aide)
-# - Proposer les requetes au groupe
-# - Faire les requêtes
-# - Rédiger le MLD
-
 DROP TABLE IF EXISTS Concerne;
 DROP TABLE IF EXISTS Tri;
 DROP TABLE IF EXISTS Recolte;
@@ -159,7 +150,9 @@ VALUES (1, 1),
 INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
 VALUES (1, 1, 50),
        (2, 1, 74),
-       (3, 2, 34);
+       (2, 2, 26),
+       (3, 2, 34),
+       (1, 2, 42);
 
 -- INSERTs pour la série de Tests/SELECTs
 INSERT INTO Client (nom_client, prenom_client, tel_client, adresse_client, email_client, date_naissace_client,
@@ -234,7 +227,7 @@ SET prix_total = (SELECT SUM(Type_vetement.prix_kg_type * Concerne.poids_type_ve
 WHERE Achat.prix_total IS NULL;
 
 
--- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024 (validé)
+-- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024
 SELECT sous_requete.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
 FROM (SELECT Achat.id_client AS id_client
       FROM Concerne
@@ -245,76 +238,34 @@ FROM (SELECT Achat.id_client AS id_client
       GROUP BY Achat.id_client) AS sous_requete
          JOIN Client ON sous_requete.id_client = Client.id_client;
 
--- Pour un ramassage donné, afficher le poids trié selon les types de vetements (validé)
+-- Afficher le poids trié selon les types de vetements
 SELECT Type_vetement.libelle_type, sous_requete.poids_total
 FROM (SELECT Tri.id_type AS id_type, SUM(Tri.poids_type_trie) AS poids_total
       FROM Tri
-      WHERE Tri.id_ramassage = 1
       GROUP BY Tri.id_type) AS sous_requete
-         JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type;
--- TODO : Verifier !!!!!!!!!!!!!!!!!!!!!!!
-
--- Requête pour total de ventes par type de vêtement du mois dernier
-# SELECT Type_vetement.libelle_type,
-#        ROUND(SUM(Concerne.poids_type_vetement * Type_vetement.prix_kg_type), 2) AS total_ventes
-# FROM Achat
-#          JOIN Concerne ON Achat.id_achat = Concerne.id_achat
-#          JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
-# WHERE Achat.date_achat BETWEEN '2024-10-01' AND '2024-10-31'
-# GROUP BY Type_vetement.id_type, Type_vetement.libelle_type
-# ORDER BY total_ventes DESC;
-
--- Total de ventes par type de vêtement pour la période du '2024-10-01' au '2024-10-31' (modifié)
-SELECT Type_vetement.libelle_type, sous_requete.total_ventes AS total_ventes_en_euro
-FROM (SELECT Type_vetement.id_type,
-             ROUND(SUM(Concerne.poids_type_vetement * Type_vetement.prix_kg_type), 2) AS total_ventes
-      FROM Achat
-               JOIN Concerne ON Achat.id_achat = Concerne.id_achat
-               JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
-      WHERE Achat.date_achat BETWEEN '2024-10-01' AND '2024-10-31'
-      GROUP BY Type_vetement.id_type) as sous_requete
          JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type
-ORDER BY total_ventes DESC;
+ORDER BY sous_requete.poids_total DESC;
 
--- Volume de ventes pour chaque types de vetements
--- TODO : Ajouter les données necessaire et vérifier
+-- Total des ventes (en kg) par type de vêtement pour la période du '2024-10-01' au '2024-10-31'
+SELECT Type_vetement.libelle_type,
+       SUM(Concerne.poids_type_vetement) AS poids_total_kg_vendu
+FROM Achat
+         JOIN Concerne ON Achat.id_achat = Concerne.id_achat
+         JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
+WHERE Achat.date_achat BETWEEN '2024-10-01' AND '2024-10-31'
+GROUP BY Type_vetement.id_type, Type_vetement.libelle_type
+ORDER BY poids_total_kg_vendu DESC;
 
+-- Total de ventes par type de vêtement pour la période du '2024-10-01' au '2024-10-31'
+# SELECT Type_vetement.libelle_type, sous_requete.poids_total_kg_vendu
+# FROM (SELECT Type_vetement.id_type,
+#              SUM(Concerne.poids_type_vetement) AS poids_total_kg_vendu
+#       FROM Achat
+#                JOIN Concerne ON Achat.id_achat = Concerne.id_achat
+#                JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
+#       WHERE Achat.date_achat BETWEEN '2024-10-01' AND '2024-10-31'
+#       GROUP BY Type_vetement.id_type) as sous_requete
+#          JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type
+# ORDER BY poids_total_kg_vendu DESC;
 
--- Réduction moyenne selon la catégorie client
--- TODO : Ajouter les données necessaire et vérifier
-# SELECT sous_requete.reduction_moyenne, Categorie_client.libelle_categorie
-# FROM (SELECT AVG(Reduction.valeur_reduction) AS reduction_moyenne, Reduction.id_categorie
-#       FROM Reduction
-#       GROUP BY Reduction.id_categorie) AS sous_requete
-#          LEFT JOIN Categorie_client ON sous_requete.id_categorie = Categorie_client.id_categorie
-# ORDER BY sous_requete.reduction_moyenne;
-
--- Chaque type de vetements (+poids) et reduction par achat (validé)
-
--- Distance total parcouru par rammassage (validé)
-# SELECT id_benne FROM Recolte JOIN Distance_entre_benne ON  WHERE id_ramassage = 1;
-
-# SELECT *
-# FROM Benne_collecte;
-# SELECT *
-# FROM Type_vetement;
-# SELECT *
-# FROM Categorie_client;
-# SELECT *
-# FROM Reduction;
-# SELECT *
-# FROM Ramassage;
-# SELECT *
-# FROM Client;
-# SELECT *
-# FROM Achat;
-# SELECT *
-# FROM Distance_entre_benne;
-# SELECT *
-# FROM Recolte;
-# SELECT *
-# FROM Tri;
-# SELECT *
-# FROM Concerne;
-# SHOW TABLES;
-
+SHOW CREATE TABLE Concerne;
