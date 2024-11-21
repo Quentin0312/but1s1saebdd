@@ -15,7 +15,7 @@
             <tr>
                 <th>Date de ramassage</th>
                 <th>Type de vêtement</th>
-                <th>Quantité triée (kg)</th>
+                <th>Quantité triée</th>
                 {# TODO : Plutôt afficher Quantité triée * prix au kilo ! À nommer "Valeur" #}
                 <th>Prix du vêtement (au kg)</th>
                 <th>Actions</th>
@@ -28,8 +28,8 @@
                     <tr>
                         <td>{{ tri.dateRamassage }}</td>
                         <td>{{ tri.nomTypeVetement }}</td>
-                        <td>{{ tri.quantite }}</td>
-                        <td>{{ tri.prixVetement }}</td>
+                        <td>{{ tri.quantite }} kg</td>
+                        <td>{{ tri.prixVetement }} €</td>
                         <td>
                             <a href="/tri/edit?id={{ tri.id }}" class="btn btn-outline-secondary">Éditer</a>
                             <a href="/tri/delete?id={{ tri.id }}" class="btn btn-outline-danger">Supprimer</a>

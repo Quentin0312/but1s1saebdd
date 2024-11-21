@@ -100,6 +100,24 @@ def add_tri():
 
     return render_template('tri/add_tri.html', ramassages=ramassages)
 
+
+@app.route('/tri/add', methods=['POST'])
+def valid_add_tri():
+    id_ramassage = request.form['ramassage_id']
+    id_type = request.form['vetement_id']
+    poids = request.form['quantite']
+
+    mycursor = get_db().cursor()
+    sql = '''
+    INSERT INTO Tri (id_tri, id_type, id_ramassage, poids_type_trie)
+    VALUES (NULL, %s, %s, %s);
+    '''
+    mycursor.execute(sql, (id_type, id_ramassage, poids,))
+    get_db().commit()
+    # TODO : Afficher message flash
+    return redirect('/tri/show')
+
+
 @app.route('/tri/add/vetement', methods=['GET'])
 def show_type_vetement():
     idRamassage = request.args.get('id', '')
@@ -117,6 +135,8 @@ def show_type_vetement():
     vetements = mycursor.fetchall()
 
     return render_template("tri/_type_vetement.html", vetements=vetements)
+
+
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
     return render_template('achat/add_achat.html')
