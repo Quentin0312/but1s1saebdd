@@ -90,14 +90,24 @@ def add_client():
 @app.route('/tri/add', methods=['GET'])
 def add_tri():
     mycursor = get_db().cursor()
+    # Récupère uniquement les ramassages dont il est encore possible d'ajouter un tri
     sql = '''
-    SELECT id_ramassage AS id, date_ramassage AS date
-    FROM Ramassage
-    ORDER BY date;
+    SELECT sous_requete.id_ramassage AS id, Ramassage.date_ramassage AS date
+    FROM (SELECT Ramassage.id_ramassage, COUNT(Tri.id_type) AS count
+          FROM Ramassage
+                   JOIN Tri ON Tri.id_ramassage = Ramassage.id_ramassage
+          GROUP BY Ramassage.id_ramassage) AS sous_requete
+             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage
+    WHERE sous_requete.count < (SELECT COUNT(Type_vetement.id_type) FROM Type_vetement);
     '''
-
     mycursor.execute(sql)
     ramassages = mycursor.fetchall()
+
+    if len(ramassages) == 0:
+        flash(
+            "Tout les types de vêtements sont traités dans tout les ramassages, pour ajouter un ramassage, veuillez d'abord supprimer un tri !",
+            'alert-danger')
+        return redirect('/tri/show')
 
     return render_template('tri/add_tri.html', ramassages=ramassages)
 
