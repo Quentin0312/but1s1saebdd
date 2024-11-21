@@ -5,38 +5,47 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     {% block title %}
-    <title>layout</title>
+        <title>layout</title>
     {% endblock %}
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
     {% block stylesheets %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='mes_styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='mes_styles.css') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='bootstrap/css/bootstrap.css') }}">
     {% endblock %}
 </head>
 
 <body>
-    {% include('_nav.html') %}
+{% include('_nav.html') %}
 
-    {% with messages = get_flashed_messages(with_categories=true) %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-    {% for categorie, message in messages %}
-    <div class="alert-container">
-        <div role="alert" class="alert {{ categorie }}">
-            Information : <strong>{{ message }}</strong>
-        </div>
-    </div>
-    {% endfor %}
+        {% for categorie, message in messages %}
+            <div class="alert-container">
+                <div role="alert" class="alert {{ categorie }}">
+                    Information : <strong>{{ message }}</strong>
+                </div>
+            </div>
+        {% endfor %}
     {% endif %}
-    {% endwith %}
+{% endwith %}
 
-    {% block body %}
-    <h5 style="color:blue">layout.html</h5>
-    {% endblock %}
-    {% block javascripts %}
+{% block body %}
+    <h5 style="color:blue">Informations</h5>
+    <div>Groupe de TP : C1</div><br>
+    <div>Groupe de SAÉ : 20</div><br>
+    <div>Membres du groupe :</div>
+    <ul>
+        <li>Kheira OUADAH</li>
+        <li>Aurélien PAILLARD</li>
+        <li>Thomas ROYER</li>
+        <li>Quentin PAYET</li>
+    </ul>
+{% endblock %}
+{% block javascripts %}
 
     <script src="{{ url_for('static', filename='bootstrap/js/bootstrap.js') }}"></script>
-    {% endblock %}
+{% endblock %}
 </body>
 
 </html>
