@@ -54,11 +54,21 @@ def show_client():
 @app.route('/tri/show', methods=['GET'])
 def show_tri():
     mycursor = get_db().cursor()
-    sql = "SELECT * FROM Tri;"
+    sql = '''
+    SELECT R.date_ramassage AS dateRamassage,
+           Tri.id_ramassage AS idRamassage,
+           Tri.id_type      AS idTypeVetement,
+           Tv.libelle_type  AS nomTypeVetement,
+           poids_type_trie  AS quantite,
+           Tv.prix_kg_type  AS prixVetement
+    FROM Tri
+             JOIN but1s1saebdd.Ramassage R on Tri.id_ramassage = R.id_ramassage
+             JOIN but1s1saebdd.Type_vetement Tv on Tv.id_type = Tri.id_type;
+    '''
     mycursor.execute(sql)
     tris = mycursor.fetchall()
     print(tris)
-    return render_template('tri/show_tri.html')
+    return render_template('tri/show_tri.html', tris=tris)
 
 
 @app.route('/achat/show', methods=['GET'])

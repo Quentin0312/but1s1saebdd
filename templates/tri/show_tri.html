@@ -1,50 +1,49 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>afficher les tris</title>
+    <title>afficher les tris</title>
 {% endblock %}
 
 {% block body %}
-<div class="show-head-content">
-    <h3>Tris</h3>
-    <a class="btn btn-primary" href="/tri/add">Ajouter un tri</a>
-</div>
-<div class="table-container">
-    <table class="table">
-        <thead class="thead-dark">
+    <div class="show-head-content">
+        <h3>Tris</h3>
+        <a class="btn btn-primary" href="/tri/add">Ajouter un tri</a>
+    </div>
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-dark">
             <tr>
-                <th>Valeur</th>
-                <th>Catégorie client</th>
+                <th>Date de ramassage</th>
                 <th>Type de vêtement</th>
-                <th>Prix avec réduction (au kg)</th>
-                <th>Prix sans réduction (au kg)</th>
+                <th>Quantité triée (kg)</th>
+                {# TODO : PLutot afficher Quantité triée * prix au kilo ! #}
+                <th>Prix du vêtement (au kg)</th>
                 <th>Actions</th>
 
             </tr>
-        </thead>
-        <tbody>
-            {% if plats | length >= 1 %}
-            {% for ligne in plats %}
-            <tr>
-                <td>{{ ligne.nomPlat }}</td>
-                <td>{{ ligne.prixPlat }}</td>
-                <td>{{ ligne.dureePreparation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
-                <td>
-                    <a href="/tri/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
-                    <a href="/tri/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
-                </td>
-            </tr>
-            {% endfor %}
+            </thead>
+            <tbody>
+            {% if tris | length >= 1 %}
+                {% for tri in tris %}
+                    <tr>
+                        <td>{{ tri.dateRamassage }}</td>
+                        <td>{{ tri.nomTypeVetement }}</td>
+                        <td>{{ tri.quantite }}</td>
+                        <td>{{ tri.prixVetement }}</td>
+                        <td>
+                            <a href="/tri/edit?id={{ tri.id }}" class="btn btn-outline-secondary">Éditer</a>
+                            <a href="/tri/delete?id={{ tri.id }}" class="btn btn-outline-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
             {% else %}
-            <tr>
-                <td>
-                    pas de tris
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        pas de tris
+                    </td>
+                </tr>
             {% endif %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
