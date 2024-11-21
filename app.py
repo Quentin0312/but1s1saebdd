@@ -170,5 +170,60 @@ def delete_achat():
     return redirect('/achat/show')
 
 
+@app.route('/reduction/edit', methods=['GET'])
+def edit_reduction():
+    return render_template('reduction/edit_reduction.html')
+
+
+@app.route('/client/edit', methods=['GET'])
+def edit_client():
+    return render_template('client/edit_client.html')
+
+
+@app.route('/tri/edit', methods=['GET'])
+def edit_tri():
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT id_tri                     AS id,
+           Tri.id_type                AS idTypeVetement,
+           Type_vetement.libelle_type AS nomTypeVetement,
+           Tri.id_ramassage           AS idRamassage,
+           Ramassage.date_ramassage   AS dateRamassage,
+           poids_type_trie            AS quantite
+    FROM Tri
+             JOIN Type_vetement ON Tri.id_type = Type_vetement.id_type
+             JOIN Ramassage ON Tri.id_ramassage = Ramassage.id_ramassage
+    WHERE id_tri = %s;
+    '''
+    mycursor.execute(sql, (id,))
+    tri = mycursor.fetchone()
+    # TODO : Afficher message flash ?
+    return render_template('tri/edit_tri.html', tri=tri)
+
+
+@app.route('/tri/edit', methods=['POST'])
+def valid_edit_tri():
+    id = request.form['id']
+    # idRamassage = request.form['ramassage_id']
+    # idTypeVetement = request.form['typeVetement_id']
+    quantite = request.form['quantite']
+
+    mycursor = get_db().cursor()
+    sql = '''
+    UPDATE Tri SET poids_type_trie=%s WHERE id_tri=%s;
+    '''
+    mycursor.execute(sql, (quantite, id))
+    get_db().commit()
+
+    # Afficher message flash ?
+    return redirect('/tri/show')
+
+
+@app.route('/achat/edit', methods=['GET'])
+def edit_achat():
+    return render_template('achat/edit_achat.html')
+
+
 if __name__ == '__main__':
     app.run()
