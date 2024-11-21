@@ -88,26 +88,35 @@ def add_client():
 
 @app.route('/tri/add', methods=['GET'])
 def add_tri():
-    # Possible de rendre dynamique ? Dans les selectbox afficher que si possible selon contrainte unicité !
     mycursor = get_db().cursor()
-    ramassage_sql = '''
+    sql = '''
     SELECT id_ramassage AS id, date_ramassage AS date
     FROM Ramassage
     ORDER BY date;
     '''
-    vetement_sql = '''
-    SELECT id_type AS id, libelle_type AS nom
-    FROM Type_vetement
-    ORDER BY nom;
-    '''
-    mycursor.execute(ramassage_sql)
+
+    mycursor.execute(sql)
     ramassages = mycursor.fetchall()
-    mycursor.execute(vetement_sql)
+
+    return render_template('tri/add_tri.html', ramassages=ramassages)
+
+@app.route('/tri/add/vetement', methods=['GET'])
+def show_type_vetement():
+    idRamassage = request.args.get('id', '')
+
+    mycursor = get_db().cursor();
+    sql = '''
+    SELECT Type_vetement.id_type AS id, Type_vetement.libelle_type AS nom
+    FROM (SELECT Tri.id_tri, Tri.id_type
+          FROM Tri
+          WHERE Tri.id_ramassage = %s) as sousrequete
+             RIGHT JOIN Type_vetement ON sousrequete.id_type = Type_vetement.id_type
+    WHERE sousrequete.id_tri IS NULL;
+    '''
+    mycursor.execute(sql, (idRamassage,))
     vetements = mycursor.fetchall()
 
-    return render_template('tri/add_tri.html', ramassages=ramassages, vetements=vetements)
-
-
+    return render_template("tri/_type_vetement.html", vetements=vetements)
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
     return render_template('achat/add_achat.html')
