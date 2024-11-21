@@ -91,11 +91,12 @@ def add_client():
 def add_tri():
     mycursor = get_db().cursor()
     # Récupère uniquement les ramassages dont il est encore possible d'ajouter un tri
+    # TODO : Fix bug quand essaie d'ajouter alors que pas de tri !
     sql = '''
     SELECT sous_requete.id_ramassage AS id, Ramassage.date_ramassage AS date
     FROM (SELECT Ramassage.id_ramassage, COUNT(Tri.id_type) AS count
           FROM Ramassage
-                   JOIN Tri ON Tri.id_ramassage = Ramassage.id_ramassage
+                   LEFT JOIN Tri ON Tri.id_ramassage = Ramassage.id_ramassage
           GROUP BY Ramassage.id_ramassage) AS sous_requete
              JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage
     WHERE sous_requete.count < (SELECT COUNT(Type_vetement.id_type) FROM Type_vetement);

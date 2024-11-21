@@ -32,7 +32,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="quantite">Quantité (kg)</label><br>
                     <input class="form-control" type="number" id="quantite" name="quantite" value="{{ tri.quantite }}"
-                           step=".01" placeholder="Saisir la quantité" required>
+                           placeholder="Saisir la quantité" step=".01" min="0.01" max="9999" required>
                 </div>
 
                 <input type="submit" value="Modifier" name="Modifier" class="btn btn-primary">
