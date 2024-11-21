@@ -62,8 +62,8 @@ def show_tri():
            poids_type_trie  AS quantite,
            Tv.prix_kg_type  AS prixVetement
     FROM Tri
-             JOIN but1s1saebdd.Ramassage R on Tri.id_ramassage = R.id_ramassage
-             JOIN but1s1saebdd.Type_vetement Tv on Tv.id_type = Tri.id_type;
+             JOIN Ramassage R on Tri.id_ramassage = R.id_ramassage
+             JOIN Type_vetement Tv on Tv.id_type = Tri.id_type;
     '''
     mycursor.execute(sql)
     tris = mycursor.fetchall()
