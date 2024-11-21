@@ -55,7 +55,8 @@ def show_client():
 def show_tri():
     mycursor = get_db().cursor()
     sql = '''
-    SELECT R.date_ramassage AS dateRamassage,
+    SELECT Tri.id_tri AS id,
+           R.date_ramassage AS dateRamassage,
            Tri.id_ramassage AS idRamassage,
            Tri.id_type      AS idTypeVetement,
            Tv.libelle_type  AS nomTypeVetement,
@@ -140,6 +141,33 @@ def show_type_vetement():
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
     return render_template('achat/add_achat.html')
+
+
+@app.route('/reduction/delete', methods=['GET'])
+def delete_reduction():
+    return redirect('/reduction/show')
+
+
+@app.route('/client/delete', methods=['GET'])
+def delete_client():
+    return redirect('/client/show')
+
+
+@app.route('/tri/delete', methods=['GET'])
+def delete_tri():
+    id = request.args.get('id', '')
+
+    mycursor = get_db().cursor()
+    sql = "DELETE FROM Tri WHERE id_tri = %s;"
+    mycursor.execute(sql, (id,))
+    get_db().commit()
+
+    return redirect('/tri/show')
+
+
+@app.route('/achat/delete', methods=['GET'])
+def delete_achat():
+    return redirect('/achat/show')
 
 
 if __name__ == '__main__':
