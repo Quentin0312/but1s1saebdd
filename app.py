@@ -236,5 +236,25 @@ def edit_achat():
     return render_template('achat/edit_achat.html')
 
 
+@app.route('/reduction/etat', methods=['GET'])
+def show_reduction_etat():
+    return render_template('/reduction/etat_reduction.html')
+
+
+@app.route('/client/etat', methods=['GET'])
+def show_client_etat():
+    return render_template('/client/etat_client.html')
+
+
+@app.route('/tri/etat', methods=['GET'])
+def show_tri_etat():
+    return render_template('/tri/etat_tri.html')
+
+
+@app.route('/achat/etat', methods=['GET'])
+def show_achat_etat():
+    return render_template('/achat/etat_achat.html')
+
+
 if __name__ == '__main__':
     app.run()
