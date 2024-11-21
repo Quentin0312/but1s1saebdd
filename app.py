@@ -10,5 +10,9 @@ def show_layout():
 def show_reduction():
     return render_template('reduction/show_reduction.html')
 
+@app.route('/reduction/add', methods=['GET'])
+def add_reduction():
+    return render_template('reduction/add_reduction.html')
+
 if __name__ == '__main__':
     app.run()
