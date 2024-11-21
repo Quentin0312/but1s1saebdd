@@ -26,5 +26,17 @@ def show_achat():
 def add_reduction():
     return render_template('reduction/add_reduction.html')
 
+@app.route('/client/add', methods=['GET'])
+def add_client():
+    return render_template('client/add_client.html')
+
+@app.route('/tri/add', methods=['GET'])
+def add_tri():
+    return render_template('tri/add_tri.html')
+
+@app.route('/achat/add', methods=['GET'])
+def add_achat():
+    return render_template('achat/add_achat.html')
+
 if __name__ == '__main__':
     app.run()

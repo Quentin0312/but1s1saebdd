@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>Ajouter une réduction</title>
+<title>Ajouter un tri</title>
 {% endblock %}
 
 {% block body %}
 <div class="show-head-content">
-    <h3>Ajouter une réduction</h3>
+    <h3>Ajouter un tri</h3>
 </div>
 <div class="form-container">
-    <form method="post" action="/plat/add">
+    <form method="post" action="/tri/add">
         <fieldset>
-            <legend> Créer une réduction</legend>
+            <legend> Créer un tri</legend>
             <div class="mb-3">
                 <label for="nomPlat" class="form-label">Nom</label><br>
                 <input id="nomPlat" type="text" name="nomPlat" size="18" value="" placeholder="Saisir le nom du plat"
