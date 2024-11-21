@@ -55,7 +55,7 @@ def show_client():
 def show_tri():
     mycursor = get_db().cursor()
     sql = '''
-    SELECT R.date_ramassage AS dateRamassage,
+        SELECT R.date_ramassage AS dateRamassage,
            Tri.id_ramassage AS idRamassage,
            Tri.id_type      AS idTypeVetement,
            Tv.libelle_type  AS nomTypeVetement,
@@ -73,7 +73,17 @@ def show_tri():
 
 @app.route('/achat/show', methods=['GET'])
 def show_achat():
-    return render_template('achat/show_achat.html')
+    mycursor = get_db().cursor()
+    sql = ''' SELECT Achat.id_achat AS Identifiant,
+    Achat.date_achat AS Date,
+    Achat.prix_total AS Prix,
+    Client.nom_client AS Nom
+    FROM Achat
+    JOIN Client ON Achat.id_client = Client.id_client;
+    '''
+    mycursor.execute(sql)
+    achat = mycursor.fetchall()
+    return render_template('achat/show_achat.html', achat=achat)
 
 
 @app.route('/reduction/add', methods=['GET'])
