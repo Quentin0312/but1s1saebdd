@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>afficher les plats</title>
+{% endblock %}
+
+{% block body %}
+<div class="show-head-content">
+    <h3>Réductions</h3>
+    <a class="btn btn-primary" href="/plat/add">Ajouter une réduction</a>
+</div>
+<div class="table-container">
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th>id</th>
+                <th>nom</th>
+                <th>prix</th>
+                <th>durée de préparation</th>
+                <th>date de création</th>
+                <th>description</th>
+                <th>id type plat</th>
+                <th>photo</th>
+                <th>opération</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if plats | length >= 1 %}
+            {% for ligne in plats %}
+            <tr>
+                <td>{{ ligne.id }}</td>
+                <td>{{ ligne.nomPlat }}</td>
+                <td>{{ ligne.prixPlat }}</td>
+                <td>{{ ligne.dureePreparation }}</td>
+                <td>{{ ligne.dateCreation }}</td>
+                <td>{{ ligne.description }}</td>
+                <td>{{ ligne.typePlat_id }}</td>
+
+                <td>
+                    {% if ligne.photo is not none and ligne.photo != "" %}
+                    <img style="width:40px;height:40px"
+                    src="{{ url_for('static', filename = 'images/' + ligne['photo']) }}"
+                    alt="image  de {{ ligne.nom }}">
+                    {% else %}
+                    <img style="width:40px;height:40px" src="{{ url_for('static', filename='images/no_photo.jpeg') }}"
+                        alt="no image">
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/plat/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
+                    <a href="/plat/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td>
+                    pas de plat
+                </td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
