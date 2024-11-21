@@ -51,7 +51,7 @@ CREATE TABLE Client
     date_naissace_client DATE,
     id_categorie         INT NOT NULL,
     PRIMARY KEY (id_client),
-    FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
+    CONSTRAINT fk_client_categorieclient FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
 );
 
 CREATE TABLE Achat
@@ -61,7 +61,7 @@ CREATE TABLE Achat
     prix_total DECIMAL(6, 2),
     id_client  INT NOT NULL,
     PRIMARY KEY (id_achat),
-    FOREIGN KEY (id_client) REFERENCES Client (id_client)
+    CONSTRAINT fk_achat_client FOREIGN KEY (id_client) REFERENCES Client (id_client)
 );
 
 CREATE TABLE Distance_entre_benne
@@ -70,8 +70,8 @@ CREATE TABLE Distance_entre_benne
     id_benne_2     INT NOT NULL,
     distance_benne INT,
     PRIMARY KEY (id_benne_1, id_benne_2),
-    FOREIGN KEY (id_benne_1) REFERENCES Benne_collecte (id_benne),
-    FOREIGN KEY (id_benne_2) REFERENCES Benne_collecte (id_benne)
+    CONSTRAINT fk_distancebenne1_bennecollecte FOREIGN KEY (id_benne_1) REFERENCES Benne_collecte (id_benne),
+    CONSTRAINT fk_distancebenne2_bennecollecte FOREIGN KEY (id_benne_2) REFERENCES Benne_collecte (id_benne)
 );
 
 CREATE TABLE Reduction
@@ -80,8 +80,8 @@ CREATE TABLE Reduction
     id_categorie     INT,
     valeur_reduction INT,
     PRIMARY KEY (id_type, id_categorie),
-    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
+    CONSTRAINT fk_reduction_typevetement FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+    CONSTRAINT fk_reduction_categorieclient FOREIGN KEY (id_categorie) REFERENCES Categorie_client (id_categorie)
 );
 
 CREATE TABLE Recolte
@@ -89,8 +89,8 @@ CREATE TABLE Recolte
     id_benne     INT,
     id_ramassage INT,
     PRIMARY KEY (id_benne, id_ramassage),
-    FOREIGN KEY (id_benne) REFERENCES Benne_collecte (id_benne),
-    FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
+    CONSTRAINT fk_recolte_bennecollecte FOREIGN KEY (id_benne) REFERENCES Benne_collecte (id_benne),
+    CONSTRAINT fk_recolte_ramassage FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
 );
 
 CREATE TABLE Tri
@@ -99,8 +99,8 @@ CREATE TABLE Tri
     id_ramassage    INT,
     poids_type_trie DECIMAL(6, 2),
     PRIMARY KEY (id_type, id_ramassage),
-    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
+    CONSTRAINT fk_tri_typevetement FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+    CONSTRAINT fk_tri_ramassage FOREIGN KEY (id_ramassage) REFERENCES Ramassage (id_ramassage)
 );
 
 CREATE TABLE Concerne
@@ -109,33 +109,33 @@ CREATE TABLE Concerne
     id_achat            INT,
     poids_type_vetement DECIMAL(4, 2),
     PRIMARY KEY (id_type, id_achat),
-    FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
-    FOREIGN KEY (id_achat) REFERENCES Achat (id_achat)
+    CONSTRAINT fk_concerne_typevetement FOREIGN KEY (id_type) REFERENCES Type_vetement (id_type),
+    CONSTRAINT fk_concerne_idachat FOREIGN KEY (id_achat) REFERENCES Achat (id_achat)
 );
 
 -- INSERTs de base
 INSERT INTO Benne_collecte (id_benne, emplacement_benne, distance_magasin)
-VALUES (1, '1 rue gaston defferre', 2000),
-       (2, '2 rue ernest duvillard', 500),
-       (3, '3 rue marcel paul', 2100);
+VALUES (NULL, '1 rue gaston defferre', 2000),
+       (NULL, '2 rue ernest duvillard', 500),
+       (NULL, '3 rue marcel paul', 2100);
 
 INSERT INTO Type_vetement (id_type, libelle_type, prix_kg_type)
-VALUES (1, 't-shirt', 20),
-       (2, 'pantalon', 25),
-       (3, 'robe', 40),
-       (4, 'chemise', 30),
-       (5, 'jupe', 35),
-       (6, 'veste', 50);
+VALUES (NULL, 't-shirt', 20),
+       (NULL, 'pantalon', 25),
+       (NULL, 'robe', 40),
+       (NULL, 'chemise', 30),
+       (NULL, 'jupe', 35),
+       (NULL, 'veste', 50);
 
 INSERT INTO Categorie_client (id_categorie, libelle_categorie)
-VALUES (1, 'poids plume'),
-       (2, 'léger'),
-       (3, 'lourd'),
-       (4, 'méga lourd');
+VALUES (NULL, 'poids plume'),
+       (NULL, 'léger'),
+       (NULL, 'lourd'),
+       (NULL, 'méga lourd');
 
 INSERT INTO Ramassage (id_ramassage, date_ramassage)
-VALUES (1, '2024-11-04'),
-       (2, '2024-10-28');
+VALUES (NULL, '2024-11-04'),
+       (NULL, '2024-10-28');
 
 INSERT INTO Distance_entre_benne (id_benne_1, id_benne_2, distance_benne)
 VALUES (1, 2, 2100),
@@ -155,34 +155,38 @@ VALUES (1, 1, 50),
        (1, 2, 42);
 
 -- INSERTs pour la série de Tests/SELECTs
-INSERT INTO Client (nom_client, prenom_client, tel_client, adresse_client, email_client, date_naissace_client,
+INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
+                    date_naissace_client,
                     id_categorie)
-VALUES ('MARTIN', 'Elise', '0692123456', '15 avenue des lilas', 'elise.martin@gmail.com', '1985-02-12', 2),
-       ('ROBERT', 'Paul', '0692987654', '10 rue du temple', 'paul.robert@yahoo.com', '1992-09-23', 3),
-       ('LOPEZ', 'Marie', '0692334455', '8 rue de la paix', 'marie.lopez@gmail.com', '1990-07-20', 3),
-       ('SIMON', 'Alex', '0692445566', '45 boulevard du sud', 'alex.simon@hotmail.com', '1988-10-12', 4),
-       ('DUPONT', 'Jean', '0692556677', '22 rue de la liberté', 'jean.dupont@gmail.com', '1980-05-15', 2),
-       ('DURAND', 'Sophie', '0692667788', '33 avenue de la république', 'sophie.durand@yahoo.com', '1995-11-25', 3),
-       ('LEFEVRE', 'Pierre', '0692778899', '44 boulevard de la paix', 'pierre.lefevre@hotmail.com', '1987-03-10', 4),
-       ('MOREAU', 'Claire', '0692889900', '55 rue de la victoire', 'claire.moreau@gmail.com', '1991-08-20', 2),
-       ('FOURNIER', 'Luc', '0692990011', '66 avenue de la liberté', 'luc.fournier@yahoo.com', '1983-04-15', 3),
-       ('BERTRAND', 'Anne', '0692001122', '77 boulevard de la république', 'anne.bertrand@hotmail.com', '1994-12-05',
+VALUES (NULL, 'MARTIN', 'Elise', '0692123456', '15 avenue des lilas', 'elise.martin@gmail.com', '1985-02-12', 2),
+       (NULL, 'ROBERT', 'Paul', '0692987654', '10 rue du temple', 'paul.robert@yahoo.com', '1992-09-23', 3),
+       (NULL, 'LOPEZ', 'Marie', '0692334455', '8 rue de la paix', 'marie.lopez@gmail.com', '1990-07-20', 3),
+       (NULL, 'SIMON', 'Alex', '0692445566', '45 boulevard du sud', 'alex.simon@hotmail.com', '1988-10-12', 4),
+       (NULL, 'DUPONT', 'Jean', '0692556677', '22 rue de la liberté', 'jean.dupont@gmail.com', '1980-05-15', 2),
+       (NULL, 'DURAND', 'Sophie', '0692667788', '33 avenue de la république', 'sophie.durand@yahoo.com', '1995-11-25',
+        3),
+       (NULL, 'LEFEVRE', 'Pierre', '0692778899', '44 boulevard de la paix', 'pierre.lefevre@hotmail.com', '1987-03-10',
         4),
-       ('ROUX', 'Michel', '0692112233', '88 rue de la paix', 'michel.roux@gmail.com', '1981-06-30', 2);
+       (NULL, 'MOREAU', 'Claire', '0692889900', '55 rue de la victoire', 'claire.moreau@gmail.com', '1991-08-20', 2),
+       (NULL, 'FOURNIER', 'Luc', '0692990011', '66 avenue de la liberté', 'luc.fournier@yahoo.com', '1983-04-15', 3),
+       (NULL, 'BERTRAND', 'Anne', '0692001122', '77 boulevard de la république', 'anne.bertrand@hotmail.com',
+        '1994-12-05',
+        4),
+       (NULL, 'ROUX', 'Michel', '0692112233', '88 rue de la paix', 'michel.roux@gmail.com', '1981-06-30', 2);
 
 
-INSERT INTO Achat (date_achat, prix_total, id_client)
-VALUES ('2024-10-01', NULL, 3),
-       ('2024-09-01', NULL, 4),
-       ('2024-10-15', NULL, 5),
-       ('2024-10-10', NULL, 6),
-       ('2024-09-20', NULL, 3),
-       ('2024-10-15', NULL, 9),
-       ('2024-10-15', NULL, 10),
-       ('2024-09-30', NULL, 11),
-       ('2024-08-20', NULL, 5),
-       ('2024-08-10', NULL, 2),
-       ('2024-07-01', NULL, 9);
+INSERT INTO Achat (id_achat, date_achat, prix_total, id_client)
+VALUES (NULL, '2024-10-01', NULL, 3),
+       (NULL, '2024-09-01', NULL, 4),
+       (NULL, '2024-10-15', NULL, 5),
+       (NULL, '2024-10-10', NULL, 6),
+       (NULL, '2024-09-20', NULL, 3),
+       (NULL, '2024-10-15', NULL, 9),
+       (NULL, '2024-10-15', NULL, 10),
+       (NULL, '2024-09-30', NULL, 11),
+       (NULL, '2024-08-20', NULL, 5),
+       (NULL, '2024-08-10', NULL, 2),
+       (NULL, '2024-07-01', NULL, 9);
 
 
 INSERT INTO Concerne (id_type, id_achat, poids_type_vetement)
@@ -228,6 +232,7 @@ WHERE Achat.prix_total IS NULL;
 
 
 -- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024
+-- avec sous requete
 SELECT sous_requete.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
 FROM (SELECT Achat.id_client AS id_client
       FROM Concerne
@@ -237,6 +242,16 @@ FROM (SELECT Achat.id_client AS id_client
         AND YEAR(Achat.date_achat) = 2024
       GROUP BY Achat.id_client) AS sous_requete
          JOIN Client ON sous_requete.id_client = Client.id_client;
+
+-- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024
+-- sans sous requete
+SELECT Achat.id_client AS id_client
+FROM Concerne
+         JOIN Achat ON Concerne.id_achat = Achat.id_achat
+WHERE Concerne.id_type = 2
+  AND MONTH(Achat.date_achat) = 10
+  AND YEAR(Achat.date_achat) = 2024
+GROUP BY Achat.id_client;
 
 -- Afficher le poids trié selon les types de vetements
 SELECT Type_vetement.libelle_type, sous_requete.poids_total
@@ -267,5 +282,3 @@ ORDER BY poids_total_kg_vendu DESC;
 #       GROUP BY Type_vetement.id_type) as sous_requete
 #          JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type
 # ORDER BY poids_total_kg_vendu DESC;
-
-SHOW CREATE TABLE Concerne;
