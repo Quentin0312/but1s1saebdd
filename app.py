@@ -88,7 +88,24 @@ def add_client():
 
 @app.route('/tri/add', methods=['GET'])
 def add_tri():
-    return render_template('tri/add_tri.html')
+    # Possible de rendre dynamique ? Dans les selectbox afficher que si possible selon contrainte unicité !
+    mycursor = get_db().cursor()
+    ramassage_sql = '''
+    SELECT id_ramassage AS id, date_ramassage AS date
+    FROM Ramassage
+    ORDER BY date;
+    '''
+    vetement_sql = '''
+    SELECT id_type AS id, libelle_type AS nom
+    FROM Type_vetement
+    ORDER BY nom;
+    '''
+    mycursor.execute(ramassage_sql)
+    ramassages = mycursor.fetchall()
+    mycursor.execute(vetement_sql)
+    vetements = mycursor.fetchall()
+
+    return render_template('tri/add_tri.html', ramassages=ramassages, vetements=vetements)
 
 
 @app.route('/achat/add', methods=['GET'])
