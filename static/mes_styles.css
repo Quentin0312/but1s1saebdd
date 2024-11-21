@@ -1,0 +1,18 @@
+.form-container {
+  display: flex;
+  justify-content: center;
+}
+
+.table-container {
+  display: flex;
+  justify-content: center;
+  margin: 0 50px;
+}
+
+.show-head-content {
+  margin: 25px 50px;
+}
+
+.alert-container {
+  margin: 10px 50px;
+}
