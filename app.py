@@ -104,8 +104,9 @@ def add_tri():
     ramassages = mycursor.fetchall()
 
     if len(ramassages) == 0:
+        # Rewrite the message
         flash(
-            "Tout les types de vêtements sont traités dans tout les ramassages, pour ajouter un ramassage, veuillez d'abord supprimer un tri !",
+            "Tout les types de vêtements sont traités dans tout les ramassages, pour ajouter un tri, veuillez d'abord un supprimer un !",
             'alert-danger')
         return redirect('/tri/show')
 
