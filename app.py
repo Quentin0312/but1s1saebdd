@@ -60,7 +60,7 @@ def show_tri():
            Tri.id_type      AS idTypeVetement,
            Tv.libelle_type  AS nomTypeVetement,
            poids_type_trie  AS quantite,
-           Tv.prix_kg_type  AS prixVetement
+           ROUND(Tv.prix_kg_type * poids_type_trie,2) AS valeur
     FROM Tri
              JOIN Ramassage R on Tri.id_ramassage = R.id_ramassage
              JOIN Type_vetement Tv on Tv.id_type = Tri.id_type;
