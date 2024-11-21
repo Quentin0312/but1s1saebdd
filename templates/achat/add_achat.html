@@ -1,0 +1,53 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+<title>Ajouter une réduction</title>
+{% endblock %}
+
+{% block body %}
+<div class="show-head-content">
+    <h3>Ajouter une réduction</h3>
+</div>
+<div class="form-container">
+    <form method="post" action="/plat/add">
+        <fieldset>
+            <legend> Créer une réduction</legend>
+            <div class="mb-3">
+                <label for="nomPlat" class="form-label">Nom</label><br>
+                <input id="nomPlat" type="text" name="nomPlat" size="18" value="" placeholder="Saisir le nom du plat"
+                    class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="prixPlat" class="form-label">Prix</label><br>
+                <input type="number" id="prixPlat" name="prixPlat" placeholder="Saisir le prix du plat"
+                    class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="dureePreparation" class="form-label">Durée de préparation</label><br>
+                <input type="text" id="dureePreparation" name="dureePreparation"
+                    placeholder="Saisir la durée de préparation" class="form-control" required>
+            </div>
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label><br>
+                <input type="text" id="description" name="description" placeholder="Saisir la description"
+                    class="form-control">
+            </div>
+            <div class="mb-3">
+                <label for="typePlat_id" class="form-label">Type de plat</label><br>
+                <select name="typePlat_id" id="typePlat_id" class="form-select" required>
+                    <option value="">Sélectionner un type de plat</option>
+                    {% for type_plat in types_plats %}
+                    <option value={{ type_plat.id }}>{{ type_plat.nomTypePlat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="photo" class="form-label">Image</label><br>
+                <input type="text" id="photo" name="photo" placeholder="Saisir le nom de l'image" class="form-control">
+            </div>
+
+            <input type="submit" value="Valider" name="Valider" class="btn btn-primary">
+        </fieldset>
+    </form>
+</div>
+{% endblock %}

@@ -1,13 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>afficher les plats</title>
+<title>afficher les tris</title>
 {% endblock %}
 
 {% block body %}
 <div class="show-head-content">
-    <h3>Réductions</h3>
-    <a class="btn btn-primary" href="/reduction/add">Ajouter une réduction</a>
+    <h3>Tris</h3>
+    <a class="btn btn-primary" href="/tri/add">Ajouter un tri</a>
 </div>
 <div class="table-container">
     <table class="table">
@@ -32,15 +32,15 @@
                 <td>{{ ligne.dateCreation }}</td>
                 <td>{{ ligne.dateCreation }}</td>
                 <td>
-                    <a href="/reduction/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
-                    <a href="/reduction/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
+                    <a href="/tri/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
+                    <a href="/tri/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
                 </td>
             </tr>
             {% endfor %}
             {% else %}
             <tr>
                 <td>
-                    pas de réduction
+                    pas de tris
                 </td>
             </tr>
             {% endif %}
