@@ -21,15 +21,29 @@
                 labels: {{ barChartLabels | safe }},
                 datasets: [
                     {
-                        {#label: "Population (millions)",#}
-                        {#backgroundColor: ["#3e95cd", "#8e5ea2"],#}
-                        backgroundColor:["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                        label: "Quantité de vêtements trié (en kg)",
+                        {#backgroundColor:["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],#}
+                        backgroundColor: ["#3e95cd"],
                         data: {{ barChartData | safe }}
                     }
                 ]
             },
             options: {
                 legend: {display: false},
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Date de ramassage'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Quantité trié (en kg)'
+                        }
+                    }
+                },
                 title: {
                     display: true,
                     text: 'Predicted world population (millions) in 2050'

@@ -13,8 +13,9 @@ contrainte d'unicité
 
 # 25/11/24
 Idée pour la page `etat` :
+- Pour avoir les mêmes couleurs => ajouter à la db ou faire un dict pour associer !
 - Filtrer avec la date
 - Histograme => (Abs => ramassage ; Ord : Qté totale)
 - Histograme => (Abs => ramassage ; Ord : Qté cummulé selon type)
-- Diagramme circulaire du total rammasé selon type
+- [x] Diagramme circulaire du total rammasé selon type
 - Radar chart pour afficher le poids trié par type selon les ramassage (à séléctionner)
