@@ -55,12 +55,13 @@ def show_client():
 def show_tri():
     mycursor = get_db().cursor()
     sql = '''
-        SELECT R.date_ramassage AS dateRamassage,
+    SELECT Tri.id_tri AS id,
+           R.date_ramassage AS dateRamassage,
            Tri.id_ramassage AS idRamassage,
            Tri.id_type      AS idTypeVetement,
            Tv.libelle_type  AS nomTypeVetement,
            poids_type_trie  AS quantite,
-           Tv.prix_kg_type  AS prixVetement
+           ROUND(Tv.prix_kg_type * poids_type_trie,2) AS valeur
     FROM Tri
              JOIN Ramassage R on Tri.id_ramassage = R.id_ramassage
              JOIN Type_vetement Tv on Tv.id_type = Tri.id_type;
@@ -99,29 +100,172 @@ def add_client():
 
 @app.route('/tri/add', methods=['GET'])
 def add_tri():
-    # Possible de rendre dynamique ? Dans les selectbox afficher que si possible selon contrainte unicité !
     mycursor = get_db().cursor()
-    ramassage_sql = '''
-    SELECT id_ramassage AS id, date_ramassage AS date
-    FROM Ramassage
-    ORDER BY date;
+    # Récupère uniquement les ramassages dont il est encore possible d'ajouter un tri
+    # TODO : Fix bug quand essaie d'ajouter alors que pas de tri !
+    sql = '''
+    SELECT sous_requete.id_ramassage AS id, Ramassage.date_ramassage AS date
+    FROM (SELECT Ramassage.id_ramassage, COUNT(Tri.id_type) AS count
+          FROM Ramassage
+                   LEFT JOIN Tri ON Tri.id_ramassage = Ramassage.id_ramassage
+          GROUP BY Ramassage.id_ramassage) AS sous_requete
+             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage
+    WHERE sous_requete.count < (SELECT COUNT(Type_vetement.id_type) FROM Type_vetement);
     '''
-    vetement_sql = '''
-    SELECT id_type AS id, libelle_type AS nom
-    FROM Type_vetement
-    ORDER BY nom;
-    '''
-    mycursor.execute(ramassage_sql)
+    mycursor.execute(sql)
     ramassages = mycursor.fetchall()
-    mycursor.execute(vetement_sql)
+
+    if len(ramassages) == 0:
+        # Rewrite the message
+        flash(
+            "Tout les types de vêtements sont traités dans tout les ramassages, pour ajouter un tri, veuillez d'abord un supprimer un !",
+            'alert-danger')
+        return redirect('/tri/show')
+
+    return render_template('tri/add_tri.html', ramassages=ramassages)
+
+
+@app.route('/tri/add', methods=['POST'])
+def valid_add_tri():
+    id_ramassage = request.form['ramassage_id']
+    id_type = request.form['vetement_id']
+    poids = request.form['quantite']
+
+    mycursor = get_db().cursor()
+    sql = '''
+    INSERT INTO Tri (id_tri, id_type, id_ramassage, poids_type_trie)
+    VALUES (NULL, %s, %s, %s);
+    '''
+    mycursor.execute(sql, (id_type, id_ramassage, poids,))
+    get_db().commit()
+    # TODO : Afficher message flash
+    return redirect('/tri/show')
+
+
+@app.route('/tri/add/vetement', methods=['GET'])
+def show_type_vetement():
+    idRamassage = request.args.get('id', '')
+
+    mycursor = get_db().cursor();
+    sql = '''
+    SELECT Type_vetement.id_type AS id, Type_vetement.libelle_type AS nom
+    FROM (SELECT Tri.id_tri, Tri.id_type
+          FROM Tri
+          WHERE Tri.id_ramassage = %s) as sousrequete
+             RIGHT JOIN Type_vetement ON sousrequete.id_type = Type_vetement.id_type
+    WHERE sousrequete.id_tri IS NULL;
+    '''
+    mycursor.execute(sql, (idRamassage,))
     vetements = mycursor.fetchall()
 
-    return render_template('tri/add_tri.html', ramassages=ramassages, vetements=vetements)
+    return render_template("tri/_type_vetement.html", vetements=vetements)
 
 
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
     return render_template('achat/add_achat.html')
+
+
+@app.route('/reduction/delete', methods=['GET'])
+def delete_reduction():
+    return redirect('/reduction/show')
+
+
+@app.route('/client/delete', methods=['GET'])
+def delete_client():
+    return redirect('/client/show')
+
+
+@app.route('/tri/delete', methods=['GET'])
+def delete_tri():
+    id = request.args.get('id', '')
+
+    mycursor = get_db().cursor()
+    sql = "DELETE FROM Tri WHERE id_tri = %s;"
+    mycursor.execute(sql, (id,))
+    get_db().commit()
+
+    return redirect('/tri/show')
+
+
+@app.route('/achat/delete', methods=['GET'])
+def delete_achat():
+    return redirect('/achat/show')
+
+
+@app.route('/reduction/edit', methods=['GET'])
+def edit_reduction():
+    return render_template('reduction/edit_reduction.html')
+
+
+@app.route('/client/edit', methods=['GET'])
+def edit_client():
+    return render_template('client/edit_client.html')
+
+
+@app.route('/tri/edit', methods=['GET'])
+def edit_tri():
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT id_tri                     AS id,
+           Tri.id_type                AS idTypeVetement,
+           Type_vetement.libelle_type AS nomTypeVetement,
+           Tri.id_ramassage           AS idRamassage,
+           Ramassage.date_ramassage   AS dateRamassage,
+           poids_type_trie            AS quantite
+    FROM Tri
+             JOIN Type_vetement ON Tri.id_type = Type_vetement.id_type
+             JOIN Ramassage ON Tri.id_ramassage = Ramassage.id_ramassage
+    WHERE id_tri = %s;
+    '''
+    mycursor.execute(sql, (id,))
+    tri = mycursor.fetchone()
+    # TODO : Afficher message flash ?
+    return render_template('tri/edit_tri.html', tri=tri)
+
+
+@app.route('/tri/edit', methods=['POST'])
+def valid_edit_tri():
+    id = request.form['id']
+    # idRamassage = request.form['ramassage_id']
+    # idTypeVetement = request.form['typeVetement_id']
+    quantite = request.form['quantite']
+
+    mycursor = get_db().cursor()
+    sql = '''
+    UPDATE Tri SET poids_type_trie=%s WHERE id_tri=%s;
+    '''
+    mycursor.execute(sql, (quantite, id))
+    get_db().commit()
+
+    # Afficher message flash ?
+    return redirect('/tri/show')
+
+
+@app.route('/achat/edit', methods=['GET'])
+def edit_achat():
+    return render_template('achat/edit_achat.html')
+
+
+@app.route('/reduction/etat', methods=['GET'])
+def show_reduction_etat():
+    return render_template('/reduction/etat_reduction.html')
+
+
+@app.route('/client/etat', methods=['GET'])
+def show_client_etat():
+    return render_template('/client/etat_client.html')
+
+
+@app.route('/tri/etat', methods=['GET'])
+def show_tri_etat():
+    return render_template('/tri/etat_tri.html')
+
+
+@app.route('/achat/etat', methods=['GET'])
+def show_achat_etat():
+    return render_template('/achat/etat_achat.html')
 
 
 if __name__ == '__main__':

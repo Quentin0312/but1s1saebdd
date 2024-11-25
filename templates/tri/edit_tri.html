@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>modifier un tri</title>
+{% endblock %}
+
+{% block body %}
+    <div class="show-head-content">
+        <h3>Modifier un tri</h3>
+    </div>
+
+    <div class="form-container">
+        <form method="post" action="/tri/edit">
+            <fieldset>
+                <legend>Modifier un tri</legend>
+                <input type="hidden" name="id" value="{{ tri.id }}" id="id">
+
+                <div class="mb-3">
+                    <label class="form-label" for="ramassage_id">Date de ramassage</label><br>
+                    <select class="form-select" name="ramassage_id" id="ramassage_id" required disabled>
+                        <option value="{{ tri.idRamassage }}">{{ tri.dateRamassage }}</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="typeVetement_id">Type de vêtement</label><br>
+                    <select class="form-select" name="typeVetement_id" id="typeVetement_id" required disabled>
+                        <option value="{{ tri.idTypeVetement }}">{{ tri.nomTypeVetement }}</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="quantite">Quantité (kg)</label><br>
+                    <input class="form-control" type="number" id="quantite" name="quantite" value="{{ tri.quantite }}"
+                           placeholder="Saisir la quantité" step=".01" min="0.01" max="9999" required>
+                </div>
+
+                <input type="submit" value="Modifier" name="Modifier" class="btn btn-primary">
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}

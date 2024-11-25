@@ -1,0 +1,7 @@
+<label for="vetement_id" class="form-label">Type de vêtements</label><br>
+<select name="vetement_id" id="vetement_id" class="form-select" oninput="handleQuantity(this.value)" required>
+    <option value="">Sélectionner un type de vêtement</option>
+    {% for vetement in vetements %}
+        <option value={{ vetement.id }}>{{ vetement.nom }}</option>
+    {% endfor %}
+</select>
