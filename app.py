@@ -260,7 +260,26 @@ def show_client_etat():
 
 @app.route('/tri/etat', methods=['GET'])
 def show_tri_etat():
-    return render_template('/tri/etat_tri.html')
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT Ramassage.date_ramassage AS dateRamassage, sous_requete.sum_poids_type_trie AS poidsTotal
+    FROM (SELECT Tri.id_ramassage, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
+          FROM Tri
+          GROUP BY Tri.id_ramassage) AS sous_requete
+             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage;
+    '''
+    mycursor.execute(sql)
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['dateRamassage'] for elt in barChartRaw]
+    barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
+
+    barChartData = [elt['poidsTotal'] for elt in barChartRaw]
+    barChartData = [str(elt) for elt in barChartData]
+    print(barChartRaw)
+    print(barChartLabels)
+    print(barChartData)
+
+    return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData)
 
 
 @app.route('/achat/etat', methods=['GET'])

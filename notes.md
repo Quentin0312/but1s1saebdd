@@ -17,3 +17,4 @@ Idée pour la page `etat` :
 - Histograme => (Abs => ramassage ; Ord : Qté totale)
 - Histograme => (Abs => ramassage ; Ord : Qté cummulé selon type)
 - Diagramme circulaire du total rammasé selon type
+- Radar chart pour afficher le poids trié par type selon les ramassage (à séléctionner)
