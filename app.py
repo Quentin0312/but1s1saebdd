@@ -260,6 +260,7 @@ def show_client_etat():
 
 @app.route('/tri/etat', methods=['GET'])
 def show_tri_etat():
+    dateDebut = request.args.get('dateDebut', '')
     # Bar chart
     mycursor = get_db().cursor()
     sql = '''
