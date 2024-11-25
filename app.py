@@ -77,7 +77,8 @@ def show_achat():
     sql = ''' SELECT Achat.id_achat AS Identifiant,
     Achat.date_achat AS Date,
     Achat.prix_total AS Prix,
-    Client.nom_client AS Nom
+    Client.nom_client AS Nom,
+    Client.prenom_client AS Prenom
     FROM Achat
     JOIN Client ON Achat.id_client = Client.id_client;
     '''
