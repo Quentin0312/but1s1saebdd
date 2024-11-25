@@ -40,13 +40,15 @@
                     y: {
                         title: {
                             display: true,
-                            text: 'Quantité trié (en kg)'
+                            text: 'Quantité de vêtements trié (en kg)'
                         }
                     }
                 },
-                title: {
-                    display: true,
-                    text: 'Predicted world population (millions) in 2050'
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Vêtements triées selon le ramassage'
+                    }
                 }
             }
         });
@@ -57,15 +59,17 @@
             data: {
                 labels: {{ pieChartLabels | safe }},
                 datasets: [{
-                    label: "Population (millions)",
+                    label: "Total trié",
                     backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
                     data: {{ pieChartData | safe }}
                 }]
             },
             options: {
-                title: {
-                    display: true,
-                    text: 'Predicted world population (millions) in 2050'
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Total trié selon le type de vêtements'
+                    }
                 }
             }
         });
