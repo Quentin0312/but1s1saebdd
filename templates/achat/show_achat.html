@@ -22,18 +22,17 @@
             </tr>
         </thead>
         <tbody>
-            {% if plats | length >= 1 %}
-            {% for ligne in plats %}
+            {% if achat | length >= 1 %}
+            {% for ligne in achat %}
             <tr>
-                <td>{{ ligne.nomPlat }}</td>
-                <td>{{ ligne.prixPlat }}</td>
-                <td>{{ ligne.dureePreparation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
-                <td>
-                    <a href="/achat/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
-                    <a href="/achat/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
-                </td>
+                <td>{{ ligne.Identifiant }}</td>
+                <td>{{ ligne.Date }}</td>
+                <td>{{ ligne.Prix }}</td>
+                <td>{{ ligne.Nom +" "+ ligne.Prenom }}</td>
+{#                <td>#}
+{#                    <a href="/achat/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>#}
+{#                    <a href="/achat/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>#}
+{#                </td>#}
             </tr>
             {% endfor %}
             {% else %}
