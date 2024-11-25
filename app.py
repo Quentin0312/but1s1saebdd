@@ -260,6 +260,7 @@ def show_client_etat():
 
 @app.route('/tri/etat', methods=['GET'])
 def show_tri_etat():
+    # Bar chart
     mycursor = get_db().cursor()
     sql = '''
     SELECT Ramassage.date_ramassage AS dateRamassage, sous_requete.sum_poids_type_trie AS poidsTotal
@@ -272,14 +273,25 @@ def show_tri_etat():
     barChartRaw = mycursor.fetchall()
     barChartLabels = [elt['dateRamassage'] for elt in barChartRaw]
     barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
-
     barChartData = [elt['poidsTotal'] for elt in barChartRaw]
     barChartData = [str(elt) for elt in barChartData]
-    print(barChartRaw)
-    print(barChartLabels)
-    print(barChartData)
 
-    return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData)
+    # Pie chart
+    sql = '''
+    SELECT Type_vetement.libelle_type AS typeVetement, sous_requete.sum_poids_type_trie AS poidsTotal
+    FROM (SELECT Tri.id_type, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
+          FROM Tri
+          GROUP BY Tri.id_type) AS sous_requete
+             JOIN Type_vetement ON Type_vetement.id_type = sous_requete.id_type ORDER BY poidsTotal DESC;
+    '''
+    mycursor.execute(sql)
+    pieChartRaw = mycursor.fetchall()
+    pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
+    pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
+    print("pieChartData =>", pieChartData)
+
+    return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
+                           pieChartLabels=pieChartLabels, pieChartData=pieChartData)
 
 
 @app.route('/achat/etat', methods=['GET'])
