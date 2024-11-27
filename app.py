@@ -19,9 +19,9 @@ def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
             host="serveurmysql",  # à modifier
-            user="kouadah",  # à modifier
-            password="mdp",  # à modifier
-            database="BDD_kouadah_sae",  # à modifier
+            user=username,  # à modifier
+            password=mdp,  # à modifier
+            database=database,  # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
@@ -49,7 +49,23 @@ def show_reduction():
 
 @app.route('/client/show', methods=['GET'])
 def show_client():
-    return render_template('client/show_client.html')
+    mycursor = get_db().cursor()
+    sql = '''
+        SELECT Client.id_client AS id,
+               Client.nom_client AS nomClient,
+               Client.prenom_client AS prenomClient,
+               Client.tel_client AS telClient,
+               Client.adresse_client  AS adresseClient,
+               Client.email_client AS emailClient,
+               TIMESTAMPDIFF(YEAR, Client.date_naissace_client, CURRENT_DATE) AS ageClient,
+               Cat.libelle_categorie AS nomCategorie
+        FROM Client
+                 RIGHT JOIN Categorie_client Cat on Client.id_categorie = Cat.id_categorie
+                 ORDER BY id_client;
+        '''
+    mycursor.execute(sql)
+    clients = mycursor.fetchall()
+    return render_template('client/show_client.html', clients=clients)
 
 
 @app.route('/tri/show', methods=['GET'])
