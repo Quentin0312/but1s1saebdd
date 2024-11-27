@@ -5,9 +5,10 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-username = os.getenv("USERNAME")
+username = os.getenv("MY_USERNAME")
 mdp = os.getenv("MDP")
 database = os.getenv("DATABASE")
+print(username, mdp, database)
 # TODO : TO REMOVE !!! ---------------------
 app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
