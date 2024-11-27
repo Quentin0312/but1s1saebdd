@@ -5,7 +5,7 @@
 [Site exemple]()
 
 # 12/11/24
-
+test
 # 21/11/24
 
 Table réduction et tris => ajout impossible quand tout les `types de vetements` et `categorie clients` sont déjà assigné car
