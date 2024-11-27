@@ -80,7 +80,8 @@ def show_achat():
     Achat.date_achat AS Date,
     Achat.prix_total AS Prix,
     Client.nom_client AS Nom,
-    Client.prenom_client AS Prenom
+    Client.prenom_client AS Prenom,
+    Client.id_client AS IdClient
     FROM Achat
     JOIN Client ON Achat.id_client = Client.id_client;
     '''
@@ -88,6 +89,17 @@ def show_achat():
     achat = mycursor.fetchall()
     return render_template('achat/show_achat.html', achat=achat)
 
+@app.route('/achat/add', methods=['POST'])
+def valid_add_achat():
+    mycursor = get_db().cursor()
+    libelle = request.form.get('libelle','')
+    tuple_insert = (libelle,)
+    sql = " INSERT INTO Achat (libelle) VALUES (%s);"
+    mycursor.execute(sql, tuple_insert)
+    get_db().commit()
+    message = u'type ajouté, libellé : ' + libelle
+    flash(message, 'alert-success')
+    return redirect('/achat/show')
 
 @app.route('/reduction/add', methods=['GET'])
 def add_reduction():
@@ -164,7 +176,14 @@ def show_type_vetement():
 
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
-    return render_template('achat/add_achat.html')
+    mycursor = get_db().cursor()
+    sql ='''
+    SELECT Client.id_client AS id, CONCAT(Client.nom_client, ' ', Client.prenom_client) AS nomClient
+    FROM Client;
+    '''
+    mycursor.execute(sql)
+    clients = mycursor.fetchall()
+    return render_template('achat/add_achat.html', clients=clients)
 
 
 @app.route('/reduction/delete', methods=['GET'])
