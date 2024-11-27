@@ -60,7 +60,8 @@
             data: {
                 labels: {{ pieChartLabels | safe }},
                 datasets: [{
-                    label: "Total trié",
+                    label: "Total trié (en kg)",
+                    {# TODO ; Ajouter une couleur !#}
                     backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
                     data: {{ pieChartData | safe }}
                 }]
