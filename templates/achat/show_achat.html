@@ -29,10 +29,10 @@
                 <td>{{ ligne.Date }}</td>
                 <td>{{ ligne.Prix }}</td>
                 <td>{{ ligne.Nom +" "+ ligne.Prenom }}</td>
-{#                <td>#}
-{#                    <a href="/achat/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>#}
-{#                    <a href="/achat/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>#}
-{#                </td>#}
+                <td>
+                    <a href="/achat/edit?id={{ ligne.Identifiant }}" class="btn btn-outline-secondary">Éditer</a>
+                    <a href="/achat/delete?id={{ ligne.Identifiant }}" class="btn btn-outline-danger">Supprimer</a>
+                </td>
             </tr>
             {% endfor %}
             {% else %}

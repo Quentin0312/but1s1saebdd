@@ -108,13 +108,14 @@ def show_achat():
 @app.route('/achat/add', methods=['POST'])
 def valid_add_achat():
     mycursor = get_db().cursor()
-    libelle = request.form.get('libelle','')
-    tuple_insert = (libelle,)
-    sql = " INSERT INTO Achat (libelle) VALUES (%s);"
-    mycursor.execute(sql, tuple_insert)
+    Date = request.form['Date']
+    Prix = request.form['Prix']
+    IdClient = request.form['IdClient']
+
+    sql = " INSERT INTO Achat VALUES (NULL,%s,%s,%s);"
+    mycursor.execute(sql, (Date,Prix,IdClient))
     get_db().commit()
-    message = u'type ajouté, libellé : ' + libelle
-    flash(message, 'alert-success')
+
     return redirect('/achat/show')
 
 @app.route('/reduction/add', methods=['GET'])
@@ -226,6 +227,11 @@ def delete_tri():
 
 @app.route('/achat/delete', methods=['GET'])
 def delete_achat():
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = "DELETE FROM Achat WHERE id_achat = %s;"
+    mycursor.execute(sql, (id,))
+    get_db().commit()
     return redirect('/achat/show')
 
 
@@ -281,8 +287,44 @@ def valid_edit_tri():
 
 @app.route('/achat/edit', methods=['GET'])
 def edit_achat():
-    return render_template('achat/edit_achat.html')
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = ''' SELECT Achat.id_achat AS Identifiant,
+    Achat.date_achat AS Date,
+    Achat.prix_total AS Prix,
+    Client.nom_client AS Nom,
+    Client.prenom_client AS Prenom,
+    Client.id_client AS IdClient
+    FROM Achat
+    JOIN Client ON Achat.id_client = Client.id_client
+    WHERE Achat.id_achat = %s;
+    '''
+    mycursor.execute(sql, (id,))
+    achat = mycursor.fetchone()
 
+    # Requête pour récupérer tous les clients
+    sql_clients = '''
+    SELECT id_client AS IdClient, 
+           CONCAT(nom_client, ' ', prenom_client) AS NomPrenom 
+    FROM Client;
+    '''
+    mycursor.execute(sql_clients)
+    clients = mycursor.fetchall()
+    return render_template('achat/edit_achat.html', achat=achat, clients=clients)
+
+@app.route('/achat/edit', methods=['POST'])
+def valid_edit_achat():
+    id = request.form['id']
+    Date = request.form['Date']
+    Prix = request.form['Prix']
+    IdClient = request.form['IdClient']
+
+    mycursor = get_db().cursor()
+    sql = ''' UPDATE Achat SET Achat.date_achat = %s, Achat.prix_total = %s, Achat.id_client = %s WHERE id_achat = %s;
+    '''
+    mycursor.execute(sql, (Date,Prix,IdClient,id))
+    get_db().commit()
+    return redirect('/achat/show')
 
 @app.route('/reduction/etat', methods=['GET'])
 def show_reduction_etat():
