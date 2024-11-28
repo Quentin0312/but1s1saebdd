@@ -105,10 +105,11 @@ def show_achat():
     achat = mycursor.fetchall()
     return render_template('achat/show_achat.html', achat=achat)
 
+
 @app.route('/achat/add', methods=['POST'])
 def valid_add_achat():
     mycursor = get_db().cursor()
-    libelle = request.form.get('libelle','')
+    libelle = request.form.get('libelle', '')
     tuple_insert = (libelle,)
     sql = " INSERT INTO Achat (libelle) VALUES (%s);"
     mycursor.execute(sql, tuple_insert)
@@ -116,6 +117,7 @@ def valid_add_achat():
     message = u'type ajouté, libellé : ' + libelle
     flash(message, 'alert-success')
     return redirect('/achat/show')
+
 
 @app.route('/reduction/add', methods=['GET'])
 def add_reduction():
@@ -193,7 +195,7 @@ def show_type_vetement():
 @app.route('/achat/add', methods=['GET'])
 def add_achat():
     mycursor = get_db().cursor()
-    sql ='''
+    sql = '''
     SELECT Client.id_client AS id, CONCAT(Client.nom_client, ' ', Client.prenom_client) AS nomClient
     FROM Client;
     '''
@@ -296,17 +298,17 @@ def show_client_etat():
 
 @app.route('/tri/etat', methods=['GET'])
 def show_tri_etat():
-    dateDebut = request.args.get('dateDebut', '')
+    # dateDebut = request.args.get('dateDebut', '')
     # Bar chart
     mycursor = get_db().cursor()
-    sql = '''
+    bar_chart_sql = '''
     SELECT Ramassage.date_ramassage AS dateRamassage, sous_requete.sum_poids_type_trie AS poidsTotal
     FROM (SELECT Tri.id_ramassage, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
           FROM Tri
           GROUP BY Tri.id_ramassage) AS sous_requete
              JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage;
     '''
-    mycursor.execute(sql)
+    mycursor.execute(bar_chart_sql)
     barChartRaw = mycursor.fetchall()
     barChartLabels = [elt['dateRamassage'] for elt in barChartRaw]
     barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
@@ -314,21 +316,44 @@ def show_tri_etat():
     barChartData = [str(elt) for elt in barChartData]
 
     # Pie chart
-    sql = '''
+    pie_chart_sql = '''
     SELECT Type_vetement.libelle_type AS typeVetement, sous_requete.sum_poids_type_trie AS poidsTotal
     FROM (SELECT Tri.id_type, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
           FROM Tri
           GROUP BY Tri.id_type) AS sous_requete
              JOIN Type_vetement ON Type_vetement.id_type = sous_requete.id_type ORDER BY poidsTotal DESC;
     '''
-    mycursor.execute(sql)
+    mycursor.execute(pie_chart_sql)
     pieChartRaw = mycursor.fetchall()
     pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
     pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
-    print("pieChartData =>", pieChartData)
+
+    date_debut_pie_chart_sql = '''
+    SELECT Ramassage.date_ramassage
+    FROM Ramassage
+    ORDER BY date_ramassage
+    LIMIT 1;
+    '''
+
+    date_fin_pie_chart_sql = '''
+    SELECT Ramassage.date_ramassage
+    FROM Ramassage
+    ORDER BY date_ramassage DESC
+    LIMIT 1;
+    '''
+
+    mycursor.execute(date_debut_pie_chart_sql)
+    dateDebut = mycursor.fetchone()
+    print("dateDebut =>"+ dateDebut['date_ramassage'].strftime("%Y-%m-%d"))
+
+    mycursor.execute(date_fin_pie_chart_sql)
+    dateFin = mycursor.fetchone()
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
-                           pieChartLabels=pieChartLabels, pieChartData=pieChartData)
+                           pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
+                           dateFin=dateFin)
+
+
 @app.route('/tri/etat/piechart', methods=['GET'])
 def get_piechart_filtered_data():
     date_debut = request.args.get('date_debut', '')
@@ -349,10 +374,11 @@ def get_piechart_filtered_data():
     pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
     pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
     result = jsonify({
-            "labels": pieChartLabels,
-            "data": pieChartData
-        })
+        "labels": pieChartLabels,
+        "data": pieChartData
+    })
     return result
+
 
 @app.route('/achat/etat', methods=['GET'])
 def show_achat_etat():
