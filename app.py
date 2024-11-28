@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, flash, session, g
+from flask import Flask, request, render_template, redirect, flash, session, g, jsonify
 import pymysql.cursors
 # TODO : TO REMOVE !! -----------------------
 from dotenv import load_dotenv
@@ -18,7 +18,7 @@ app.secret_key = 'une cle(token) : grain de sel(any random string)'
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
-            host="serveurmysql",  # à modifier
+            host="localhost",  # à modifier
             user=username,  # à modifier
             password=mdp,  # à modifier
             database=database,  # à modifier
@@ -175,7 +175,7 @@ def valid_add_tri():
 def show_type_vetement():
     idRamassage = request.args.get('id', '')
 
-    mycursor = get_db().cursor();
+    mycursor = get_db().cursor()
     sql = '''
     SELECT Type_vetement.id_type AS id, Type_vetement.libelle_type AS nom
     FROM (SELECT Tri.id_tri, Tri.id_type
@@ -329,7 +329,30 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData)
+@app.route('/tri/etat/piechart', methods=['GET'])
+def get_piechart_filtered_data():
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
 
+    mycursor = get_db().cursor()
+    sql = ''' SELECT Type_vetement.libelle_type AS typeVetement, sous_requete.sum_poids_type_trie AS poidsTotal
+    FROM (SELECT Tri.id_type, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
+          FROM Tri
+                   JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
+          WHERE date_ramassage BETWEEN %s AND %s
+          GROUP BY Tri.id_type) AS sous_requete
+             JOIN Type_vetement ON Type_vetement.id_type = sous_requete.id_type
+    ORDER BY poidsTotal DESC;
+    '''
+    mycursor.execute(sql, (date_debut, date_fin))
+    pieChartRaw = mycursor.fetchall()
+    pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
+    pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
+    result = jsonify({
+            "labels": pieChartLabels,
+            "data": pieChartData
+        })
+    return result
 
 @app.route('/achat/etat', methods=['GET'])
 def show_achat_etat():
