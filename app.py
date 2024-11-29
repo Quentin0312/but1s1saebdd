@@ -352,6 +352,22 @@ def show_tri_etat():
     radarChartLabelsRaw = mycursor.fetchall()
     radarChartLabels = [elt['label'] for elt in radarChartLabelsRaw]
 
+    radar_chart_dataset_sql = '''
+    SELECT Tri.id_type, Type_vetement.libelle_type, Tri.id_ramassage, Ramassage.date_ramassage, Tri.poids_type_trie
+    FROM Tri
+             JOIN Type_vetement ON Type_vetement.id_type = Tri.id_type
+             JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
+    ORDER BY Tri.id_ramassage, id_type;
+    '''
+    mycursor.execute(radar_chart_dataset_sql)
+    radarChartDatasetRaw = mycursor.fetchall()
+    radarChartData = {}
+    for elt in radarChartDatasetRaw:
+        print(elt)
+        if elt['date_ramassage'].strftime("%Y-%m-%d") in radarChartData.keys():
+            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type']-1] = float(elt['poids_type_trie'])
+        else :
+            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")] = [0 for elt in radarChartLabels]
 
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
@@ -363,7 +379,7 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
-                           dateFin=dateFin, radarChartLabels=radarChartLabels)
+                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData)
 
 
 @app.route('/tri/etat/piechart', methods=['GET'])
