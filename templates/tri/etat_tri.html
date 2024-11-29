@@ -134,7 +134,7 @@
             new Chart(document.getElementById("radar-chart"), {
                 type: 'radar',
                 data: {
-                    labels: ["Africa", "Asia", "Europe", "Latin America", "North America"],
+                    labels: {{ radarChartLabels | safe }},
                     datasets: [
                         {
                             label: "1950",

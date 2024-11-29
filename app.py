@@ -343,9 +343,15 @@ def show_tri_etat():
     '''
 
     # TODO : Radar chart
-    radar_chart_sql = '''
-    
+    radar_chart_labels = '''
+    SELECT libelle_type AS label
+    FROM Type_vetement
+    ORDER BY id_type;
     '''
+    mycursor.execute(radar_chart_labels)
+    radarChartLabelsRaw = mycursor.fetchall()
+    radarChartLabels = [elt['label'] for elt in radarChartLabelsRaw]
+
 
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
@@ -357,7 +363,7 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
-                           dateFin=dateFin)
+                           dateFin=dateFin, radarChartLabels=radarChartLabels)
 
 
 @app.route('/tri/etat/piechart', methods=['GET'])
