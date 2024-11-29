@@ -343,12 +343,12 @@ def show_tri_etat():
     '''
 
     mycursor.execute(date_debut_pie_chart_sql)
-    dateDebut = mycursor.fetchone()
-    dateDebut = dateDebut['date_ramassage'].strftime("%Y-%m-%d")
+    dateDebutResponse = mycursor.fetchone()
+    dateDebut = dateDebutResponse['date_ramassage'].strftime("%Y-%m-%d")
 
     mycursor.execute(date_fin_pie_chart_sql)
-    dateFin = mycursor.fetchone()
-    dateFin = dateFin['date_ramassage'].strftime("%Y-%m-%d")
+    dateFinResponse = mycursor.fetchone()
+    dateFin = dateFinResponse['date_ramassage'].strftime("%Y-%m-%d")
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,

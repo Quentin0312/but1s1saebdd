@@ -17,7 +17,7 @@
             chart.data.datasets[0].data = datas;
             chart.update();
         }
-
+        // TODO : Also filter bar-chart and radar => all the page !!
         async function filterPieChart() {
             const dateDebut = document.getElementById("start-date").value;
             const dateFin = document.getElementById("end-date").value;
@@ -55,7 +55,7 @@
             <input type="date" id="end-date" name="trip-start" value="{{ dateFin | safe }}" min="{{ dateDebut | safe }}"
                    max="{{ dateFin | safe }}"/>
             <button onclick="filterPieChart()">Valider</button>
-            <div id="pie-chart-container">
+            <div id="pie-chart-container" style="height: 100%">
                 <canvas id="pie-chart" width="100%" height="100%"></canvas>
             </div>
         </div>
