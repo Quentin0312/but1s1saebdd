@@ -342,6 +342,11 @@ def show_tri_etat():
     LIMIT 1;
     '''
 
+    # TODO : Radar chart
+    radar_chart_sql = '''
+    
+    '''
+
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
     dateDebut = dateDebutResponse['date_ramassage'].strftime("%Y-%m-%d")
