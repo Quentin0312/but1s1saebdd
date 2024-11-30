@@ -306,7 +306,8 @@ def show_tri_etat():
     FROM (SELECT Tri.id_ramassage, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
           FROM Tri
           GROUP BY Tri.id_ramassage) AS sous_requete
-             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage;
+             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage
+          ORDER BY Ramassage.date_ramassage;
     '''
     mycursor.execute(bar_chart_sql)
     barChartRaw = mycursor.fetchall()
