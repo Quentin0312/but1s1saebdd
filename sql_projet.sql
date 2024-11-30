@@ -155,42 +155,35 @@ VALUES (1, 1),
        (3, 2);
 
 INSERT INTO Tri (id_type, id_ramassage, poids_type_trie)
-VALUES
-    -- Type 1 : Ramassage 3 a un poids plus faible
-    (1, 1, 55),
-    (1, 2, 74),
-    (1, 3, 60),
-    (1, 4, 50),
+VALUES (1, 1, 55),
+       (1, 2, 74),
+       (1, 3, 60),
+       (1, 4, 50),
 
-    -- Type 2 : Ramassage 2 a un poids plus faible
-    (2, 1, 45),
-    (2, 2, 55),
-    (2, 3, 70),
-    (2, 4, 30),
+       (2, 1, 45),
+       (2, 2, 55),
+       (2, 3, 70),
+       (2, 4, 30),
 
-    -- Type 3 : Ramassage 4 a un poids plus faible
-    (3, 1, 13),
-    (3, 2, 12),
-    (3, 3, 10),
-    (3, 4, 5),
+       (3, 1, 13),
+       (3, 2, 25),
+       (3, 3, 10),
+       (3, 4, 5),
 
-    -- Type 4 : Ramassage 1 a un poids plus faible
-    (4, 1, 48),
-    (4, 2, 55),
-    (4, 3, 35),
-    (4, 4, 20),
+       (4, 1, 48),
+       (4, 2, 55),
+       (4, 3, 35),
+       (4, 4, 20),
 
-    -- Type 5 : Ramassage 2 a un poids plus faible
-    (5, 1, 18),
-    (5, 2, 20),
-    (5, 3, 15),
-    (5, 4, 2),
+       (5, 1, 18),
+       (5, 2, 20),
+       (5, 3, 15),
+       (5, 4, 2),
 
-    -- Type 6 : Ramassage 3 a un poids plus faible
-    (6, 1, 45),
-    (6, 2, 50),
-    (6, 3, 60),
-    (6, 4, 30);
+       (6, 1, 45),
+       (6, 2, 50),
+       (6, 3, 60),
+       (6, 4, 30);
 
 -- INSERTs pour la série de Tests/SELECTs
 INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
