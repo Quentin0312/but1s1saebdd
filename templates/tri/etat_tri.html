@@ -36,6 +36,20 @@
                     {#console.log(result)#}
                     {#setupPieChart(result.labels, result.data)#}
                 });
+            fetch('/tri/etat/barchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)
+                .then(response => response.json())
+                .then(response => {
+                    const result = response;
+                    removeData(barChart);
+                    addData(barChart, result.labels, result.data)
+                });
+            fetch('/tri/etat/radarchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)
+                .then(response => response.json())
+                .then(response => {
+                    const result = response;
+                    removeData(radarChart);
+                    addData(radarChart, result.labels, result.data)
+                });
 
         }
     </script>

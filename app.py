@@ -491,6 +491,79 @@ def get_piechart_filtered_data():
     })
     return result
 
+@app.route('/tri/etat/barchart', methods=['GET'])
+def get_barchart_filtered_data():
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
+
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT Ramassage.date_ramassage AS dateRamassage, sous_requete.sum_poids_type_trie AS poidsTotal
+    FROM (SELECT Tri.id_ramassage, SUM(Tri.poids_type_trie) AS sum_poids_type_trie
+          FROM Tri
+          GROUP BY Tri.id_ramassage) AS sous_requete
+             JOIN Ramassage ON Ramassage.id_ramassage = sous_requete.id_ramassage
+          WHERE date_ramassage BETWEEN %s AND %s
+          ORDER BY Ramassage.date_ramassage;
+    '''
+    mycursor.execute(sql, (date_debut, date_fin))
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['dateRamassage'] for elt in barChartRaw]
+    barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
+    barChartData = [elt['poidsTotal'] for elt in barChartRaw]
+    barChartData = [str(elt) for elt in barChartData]
+
+    result = jsonify({
+        "labels": barChartLabels,
+        "data": barChartData
+    })
+    return result
+
+@app.route('/tri/etat/radarchart', methods=['GET'])
+def get_radarchart_filtered_data():
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
+
+    mycursor = get_db().cursor()
+    # Labels
+    radar_chart_labels_sql = '''
+    SELECT libelle_type AS label
+    FROM Type_vetement
+    ORDER BY id_type;
+    '''
+    mycursor.execute(radar_chart_labels_sql)
+    radarChartLabelsRaw = mycursor.fetchall()
+    radarChartLabels = [elt['label'] for elt in radarChartLabelsRaw]
+
+    # Chart dataset
+    sql = '''
+    SELECT Tri.id_type, Type_vetement.libelle_type, Tri.id_ramassage, Ramassage.date_ramassage, Tri.poids_type_trie
+    FROM Tri
+             JOIN Type_vetement ON Type_vetement.id_type = Tri.id_type
+             JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
+    WHERE date_ramassage BETWEEN %s AND %s
+    ORDER BY Tri.id_ramassage, id_type;
+    '''
+    mycursor.execute(sql, (date_debut, date_fin))
+    radarChartRaw = mycursor.fetchall()
+    radarChartData = {}
+
+    for elt in radarChartRaw:
+        elt_date_ramassage = elt['date_ramassage'].strftime("%Y-%m-%d")
+
+        if elt_date_ramassage not in radarChartData.keys():
+            radarChartData[elt_date_ramassage] = [0 for elt in radarChartLabels]
+
+        radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
+            elt['poids_type_trie'])
+
+    result = jsonify({
+        "labels": radarChartLabels,
+        "data": radarChartData
+    })
+
+    return result
+
 
 @app.route('/achat/etat', methods=['GET'])
 def show_achat_etat():
