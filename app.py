@@ -89,7 +89,7 @@ def show_client():
                Cat.libelle_categorie AS nomCategorie
         FROM Client
         RIGHT JOIN Categorie_client Cat on Client.id_categorie = Cat.id_categorie
-        HAVING id_client IS NOT NULL
+        WHERE id_client IS NOT NULL
         ORDER BY id_client;
         '''
     mycursor.execute(sql)
