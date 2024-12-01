@@ -246,19 +246,20 @@ def delete_client():
     id = request.args.get('id', '')
     mycursor = get_db().cursor()
 
-    sql =  "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
+    sql = "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
     mycursor.execute(sql, (id,))
     achats = mycursor.fetchall()
 
-    if achats :
+    if achats:
         return render_template('client/delete_client.html', achats=achats)
 
-    else :
+    else:
         sql = "DELETE FROM Client WHERE id_client = %s;"
         mycursor.execute(sql, (id,))
         get_db().commit()
 
         return redirect('/client/show')
+
 
 @app.route('/client/fulldelete', methods=['GET'])
 def fulldelete_client():
@@ -270,7 +271,7 @@ def fulldelete_client():
     mycursor.execute(sql, (id,))
     concerne = mycursor.fetchall()
 
-    if concerne :
+    if concerne:
         sql = "DELETE FROM Concerne WHERE id_achat = %s;"
         mycursor.execute(sql, (id,))
         get_db().commit()
@@ -279,14 +280,14 @@ def fulldelete_client():
     mycursor.execute(sql, (id,))
     get_db().commit()
 
-    sql =  "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
+    sql = "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
     mycursor.execute(sql, (idClient,))
     achats = mycursor.fetchall()
 
-    if achats :
+    if achats:
         return render_template('client/delete_client.html', achats=achats)
 
-    else :
+    else:
         sql = "DELETE FROM Client WHERE id_client = %s;"
         mycursor.execute(sql, (idClient,))
         get_db().commit()
@@ -442,13 +443,15 @@ def show_tri_etat():
     mycursor.execute(radar_chart_dataset_sql)
     radarChartDatasetRaw = mycursor.fetchall()
     radarChartData = {}
+
     for elt in radarChartDatasetRaw:
-        print(elt)
         if elt['date_ramassage'].strftime("%Y-%m-%d") in radarChartData.keys():
             radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type'] - 1] = float(
                 elt['poids_type_trie'])
         else:
             radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")] = [0 for elt in radarChartLabels]
+            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type'] - 1] = float(
+                elt['poids_type_trie'])
 
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
