@@ -48,7 +48,7 @@
                     <select name="idCategorie" id="idCategorie" class="form-select" required>
                         <option value="">Sélectionner une catégorie</option>
                         {% for cat in catClient %}
-                            <option value={{ cat.id }}>{{ cat.nomCategorie }}</option>
+                            <option value="{{ cat.id }}">{{ cat.nomCategorie }}</option>
                         {% endfor %}
                     </select>
                 </div>

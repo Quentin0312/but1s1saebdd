@@ -1,46 +1,47 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-    <title>Ajouter un client</title>
+    <title>Modifier un client</title>
 {% endblock %}
 
 {% block body %}
     <div class="show-head-content">
-        <h3>Ajouter un client</h3>
+        <h3>Modifier un client</h3>
     </div>
     <div class="form-container">
-        <form method="post" action="/client/add">
+        <form method="post" action="/client/edit">
             <fieldset>
-                <legend> Créer un client</legend>
+                <legend>Modifications : </legend>
+                <input type="hidden" name="id" value="{{ client.id }}">
                 <div class="mb-3">
                     <label for="nomClient" class="form-label">Nom</label><br>
-                    <input id="nomClient" type="text" name="nomClient" size="18" value=""
+                    <input id="nomClient" type="text" name="nomClient" size="18" value="{{ client.nomClient }}"
                            placeholder="Saisir le nom du client"
                            class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="prenomClient" class="form-label">Prénom</label><br>
                     <input type="text" id="prenomClient" name="prenomClient" placeholder="Saisir le prénom du client"
-                           class="form-control" required>
+                           value="{{ client.prenomClient }}" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="telClient" class="form-label">Téléphone (10 chiffres)</label><br>
-                    <input type="tel" id="telClient" name="telClient" pattern="[0-9]{10}"
+                    <input type="tel" id="telClient" name="telClient" pattern="[0-9]{10}" value="{{ client.telClient }}"
                            placeholder="Saisir le numéro de téléphone" class="form-control" required>
                 </div>
                 <div class="mb-3">
                     <label for="adresseClient" class="form-label">Adresse</label><br>
                     <input type="text" id="adresseClient" name="adresseClient" placeholder="Saisir l'adresse du client"
-                           class="form-control">
+                           value="{{ client.adresseClient }}" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="emailClient" class="form-label">E-mail</label><br>
                     <input type="email" id="emailClient" name="emailClient" placeholder="Saisir l'E-mail du client"
-                           class="form-control">
+                           value="{{ client.emailClient }}" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="dateClient" class="form-label">Date de naissance</label><br>
-                    <input type="date" id="dateClient" name="dateClient"
+                    <input type="date" id="dateClient" name="dateClient" value="{{ client.dateClient }}"
                            class="form-control">
                 </div>
                 <div class="mb-3">
@@ -48,7 +49,7 @@
                     <select name="idCategorie" id="idCategorie" class="form-select" required>
                         <option value="">Sélectionner une catégorie</option>
                         {% for cat in catClient %}
-                            <option value={{ cat.id }}>{{ cat.nomCategorie }}</option>
+                            <option value="{{ cat.id }}" {% if client.idCategorie is defined and client.idCategorie == cat.id %}selected{% endif %}>{{ cat.nomCategorie }}</option>
                         {% endfor %}
                     </select>
                 </div>

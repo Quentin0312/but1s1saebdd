@@ -232,7 +232,6 @@ def valid_add_client():
     adresseClient = request.form.get('adresseClient')
     emailClient = request.form.get('emailClient')
     dateClient = request.form.get('dateClient')
-    dateClient = datetime.strptime(dateClient, '%Y-%m-%d').date()
     idCategorie = request.form.get('idCategorie')
 
     mycursor = get_db().cursor()
@@ -332,7 +331,7 @@ def delete_reduction():
 
 @app.route('/client/delete', methods=['GET'])
 def delete_client():
-    id = request.args.get('id', '')
+    id = request.args.get('id')
     mycursor = get_db().cursor()
 
     sql = "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
@@ -441,7 +440,53 @@ def valid_edit_reduction():
 
 @app.route('/client/edit', methods=['GET'])
 def edit_client():
-    return render_template('client/edit_client.html')
+    id = request.args.get('id')
+    mycursor = get_db().cursor()
+    sql = '''
+        SELECT Client.id_client AS id,
+               Client.nom_client AS nomClient,
+               Client.prenom_client AS prenomClient,
+               Client.tel_client AS telClient,
+               Client.adresse_client  AS adresseClient,
+               Client.email_client AS emailClient,
+               Client.date_naissace_client AS dateClient,
+               Client.id_categorie AS idCategorie
+        FROM Client
+        WHERE id_client = %s;
+        '''
+    mycursor.execute(sql, (id,))
+    client = mycursor.fetchone()
+
+    sql = '''
+            SELECT Categorie_client.id_categorie AS id, 
+                Categorie_client.libelle_categorie AS nomCategorie
+            FROM Categorie_client;
+            '''
+    mycursor.execute(sql)
+    catClient = mycursor.fetchall()
+
+    return render_template('client/edit_client.html', client=client, catClient=catClient)
+
+@app.route('/client/edit', methods=['POST'])
+def valid_edit_client():
+    id = request.form.get('id')
+    nomClient = request.form.get('nomClient')
+    prenomClient = request.form.get('prenomClient')
+    telClient = request.form.get('telClient')
+    adresseClient = request.form.get('adresseClient')
+    emailClient = request.form.get('emailClient')
+    dateClient = request.form.get('dateClient')
+    idCategorie = request.form.get('idCategorie')
+
+    mycursor = get_db().cursor()
+    sql = ''' UPDATE Client SET nom_client=%s, prenom_client=%s, tel_client=%s, adresse_client=%s, email_client=%s,
+                    date_naissace_client=%s,
+                    id_categorie=%s WHERE id_client=%s;'''
+    tuple_sql = (nomClient, prenomClient, telClient, adresseClient, emailClient, dateClient, idCategorie, id)
+    mycursor.execute(sql, tuple_sql)
+    get_db().commit()
+
+    return redirect('/client/show')
 
 
 @app.route('/tri/edit', methods=['GET'])
