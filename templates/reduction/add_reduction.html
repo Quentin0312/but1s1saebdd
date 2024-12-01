@@ -6,10 +6,6 @@
 
 {% block body %}
     <script>
-        {#function disableQuantityInput() {#}
-        {#    document.getElementById('quantite').value = "";#}
-        {#    document.getElementById('quantite').disabled = true;#}
-
         function getCategorieClient(e) {
             if (e == "") {
                 html = `<label for="CatClient" class="form-label">Catégorie de client</label><br>
@@ -20,7 +16,7 @@
                 disableQuantityInput();
 
             } else {
-                fetch('/reduction/add/categorie?id=' + e)
+                fetch('/reduction/add/categorie?type_id=' + e)
                     .then(response => response.text())
                     .then(html => {
                         document.getElementById('categorie-select').innerHTML = html;
@@ -28,10 +24,6 @@
             }
         }
 
-        {#function handleQuantity(e) {#}
-        {#    e == "" ?#}
-        {#        disableQuantityInput()#}
-        {#        : document.getElementById('quantite').disabled = false;#}
 
     </script>
     <div class="show-head-content">

@@ -16,33 +16,33 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
 
-# def get_db():
-#     if 'db' not in g:
-#         g.db = pymysql.connect(
-#             host="localhost",  # à modifier
-#             user="root",  # à modifier
-#             password="secret",  # à modifier
-#             database="BDD_troyer2",  # à modifier
-#             charset='utf8mb4',
-#             cursorclass=pymysql.cursors.DictCursor
-#         )
-#         # à activer sur les machines personnelles :
-#         # activate_db_options(g.db)
-#     return g.db
-
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
             host="localhost",  # à modifier
-            user=username,  # à modifier
-            password=mdp,  # à modifier
-            database=database,  # à modifier
+            user="root",  # à modifier
+            password="secret",  # à modifier
+            database="BDD_troyer2",  # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
         # à activer sur les machines personnelles :
         # activate_db_options(g.db)
     return g.db
+
+# def get_db():
+#     if 'db' not in g:
+#         g.db = pymysql.connect(
+#             host="localhost",  # à modifier
+#             user=username,  # à modifier
+#             password=mdp,  # à modifier
+#             database=database,  # à modifier
+#             charset='utf8mb4',
+#             cursorclass=pymysql.cursors.DictCursor
+#         )
+#         # à activer sur les machines personnelles :
+#         # activate_db_options(g.db)
+#     return g.db
 
 
 @app.teardown_appcontext
@@ -538,11 +538,117 @@ def valid_edit_tri():
 def edit_achat():
     return render_template('achat/edit_achat.html')
 
-
 @app.route('/reduction/etat', methods=['GET'])
 def show_reduction_etat():
-    return render_template('/reduction/etat_reduction.html')
+    mycursor = get_db().cursor()
 
+    # Charger les données pour le graphique à barres
+    bar_chart_sql = '''
+    SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+    FROM Reduction
+    JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+    GROUP BY Reduction.id_type
+    ORDER BY totalReduction DESC;
+    '''
+    mycursor.execute(bar_chart_sql)
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['typeVetement'] for elt in barChartRaw]
+    barChartData = [elt['totalReduction'] for elt in barChartRaw]
+
+    # Charger les données pour le graphique en camembert
+    pie_chart_sql = '''
+    SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction
+    FROM Reduction
+    JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+    GROUP BY Reduction.id_categorie
+    ORDER BY totalReduction DESC;
+    '''
+    mycursor.execute(pie_chart_sql)
+    pieChartRaw = mycursor.fetchall()
+    pieChartLabels = [elt['categorie'] for elt in pieChartRaw]
+    pieChartData = [elt['totalReduction'] for elt in pieChartRaw]
+
+    # Charger la liste des catégories pour le filtre
+    categories_sql = 'SELECT id_categorie AS id, libelle_categorie AS libelle FROM Categorie_client;'
+    mycursor.execute(categories_sql)
+    categories = mycursor.fetchall()
+
+    return render_template(
+        '/reduction/etat_reduction.html',
+        barChartLabels=barChartLabels,
+        barChartData=barChartData,
+        pieChartLabels=pieChartLabels,
+        pieChartData=pieChartData,
+        categories=categories
+    )
+
+@app.route('/reduction/etat/barchart', methods=['GET'])
+def reduction_get_barchart_filtered_data():
+    categories = request.args.get('categories')  # Catégories sélectionnées sous forme de chaîne CSV
+    client_types = request.args.get('client_types')  # Types de clients sélectionnés sous forme de chaîne CSV
+
+    category_ids = [int(id) for id in categories.split(',')] if categories else []
+    client_type_ids = [int(id) for id in client_types.split(',')] if client_types else []
+
+    mycursor = get_db().cursor()
+
+    # Construction de la requête SQL
+    if category_ids and client_type_ids:
+        # Filtrer par catégories et types de clients
+        placeholders_categories = ','.join(['%s'] * len(category_ids))
+        placeholders_client_types = ','.join(['%s'] * len(client_type_ids))
+        sql = f'''
+        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+        JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+        WHERE Reduction.id_categorie IN ({placeholders_categories})
+        AND Categorie_client.id_categorie IN ({placeholders_client_types})
+        GROUP BY Reduction.id_type
+        ORDER BY totalReduction DESC;
+        '''
+        mycursor.execute(sql, category_ids + client_type_ids)
+    elif category_ids:
+        # Si seulement les catégories sont sélectionnées
+        placeholders_categories = ','.join(['%s'] * len(category_ids))
+        sql = f'''
+        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+        WHERE Reduction.id_categorie IN ({placeholders_categories})
+        GROUP BY Reduction.id_type
+        ORDER BY totalReduction DESC;
+        '''
+        mycursor.execute(sql, category_ids)
+    elif client_type_ids:
+        # Si seulement les types de clients sont sélectionnés
+        placeholders_client_types = ','.join(['%s'] * len(client_type_ids))
+        sql = f'''
+        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+        JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+        WHERE Categorie_client.id_categorie IN ({placeholders_client_types})
+        GROUP BY Reduction.id_type
+        ORDER BY totalReduction DESC;
+        '''
+        mycursor.execute(sql, client_type_ids)
+    else:
+        # Aucune catégorie ou type de client sélectionné : récupérer toutes les données
+        sql = '''
+        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+        GROUP BY Reduction.id_type
+        ORDER BY totalReduction DESC;
+        '''
+        mycursor.execute(sql)
+
+    result = mycursor.fetchall()
+    labels = [row['typeVetement'] for row in result]
+    data = [row['totalReduction'] for row in result]
+
+    return jsonify({'labels': labels, 'data': data})
 
 @app.route('/client/etat', methods=['GET'])
 def show_client_etat():
