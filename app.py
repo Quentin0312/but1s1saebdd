@@ -15,20 +15,33 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
-
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
             host="localhost",  # à modifier
-            user=username,  # à modifier
-            password=mdp,  # à modifier
-            database=database,  # à modifier
+            user="root",  # à modifier
+            password="secret",  # à modifier
+            database="BDD_troyer2",  # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
         # à activer sur les machines personnelles :
         # activate_db_options(g.db)
     return g.db
+
+# def get_db():
+#     if 'db' not in g:
+#         g.db = pymysql.connect(
+#             host="localhost",  # à modifier
+#             user=username,  # à modifier
+#             password=mdp,  # à modifier
+#             database=database,  # à modifier
+#             charset='utf8mb4',
+#             cursorclass=pymysql.cursors.DictCursor
+#         )
+#         # à activer sur les machines personnelles :
+#         # activate_db_options(g.db)
+#     return g.db
 
 
 @app.teardown_appcontext
@@ -45,8 +58,22 @@ def show_layout():
 
 @app.route('/reduction/show', methods=['GET'])
 def show_reduction():
-    return render_template('reduction/show_reduction.html')
-
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT Reduction.id_reduction AS id,
+           Reduction.valeur_reduction AS valeur,
+           Tv.libelle_type AS type,
+           Cc.libelle_categorie AS categorie,
+           (Tv.prix_kg_type - Tv.prix_kg_type * (Reduction.valeur_reduction/100)) AS prixAuKgReduc,
+           Tv.prix_kg_type AS prixAuKgSansReduc
+    FROM Reduction
+             JOIN Type_vetement Tv on Tv.id_type = Reduction.id_type
+             JOIN Categorie_client Cc on Reduction.id_categorie = Cc.id_categorie;
+        '''
+    mycursor.execute(sql)
+    reduction = mycursor.fetchall()
+    print(reduction)
+    return render_template('reduction/show_reduction.html', reduction=reduction)
 
 @app.route('/client/show', methods=['GET'])
 def show_client():
@@ -123,7 +150,65 @@ def valid_add_achat():
 
 @app.route('/reduction/add', methods=['GET'])
 def add_reduction():
-    return render_template('reduction/add_reduction.html')
+    mycursor = get_db().cursor()
+
+    # TODO : Fix bug quand essaie d'ajouter alors que pas de tri !
+    sql = '''
+        SELECT sous_requete.id_type AS id, Type_vetement.libelle_type AS type
+        FROM (SELECT Type_vetement.id_type, COUNT(Reduction.id_type) AS count
+              FROM Type_vetement
+                       LEFT JOIN Reduction ON Reduction.id_type = Type_vetement.id_type
+              GROUP BY Type_vetement.id_type) AS sous_requete
+                 JOIN Type_vetement ON Type_vetement.id_type = sous_requete.id_type
+        WHERE sous_requete.count < (SELECT COUNT(Type_vetement.id_type) FROM Type_vetement);
+        '''
+    mycursor.execute(sql)
+    types_vetements = mycursor.fetchall()
+
+    if len(types_vetements) == 0:
+        flash(
+            "Tout les types de vêtements sont déjà tous associés a toutes les catégories, pour en ajouter une réduction, veuillez d'abord un supprimer une !",
+            'alert-danger')
+        return redirect('/reduction/show')
+    return render_template('reduction/add_reduction.html', types_vetements=types_vetements)
+
+
+@app.route('/reduction/add', methods=['POST'])
+def valid_add_reduction():
+    # Récupérer les données du formulaire
+    valeur_reduction = request.form['valReduc']
+    id_type_vetement = request.form['TypeVetement']
+    id_categorie_client = request.form['CatClient']
+
+    # Insertion de la réduction dans la base de données
+    mycursor = get_db().cursor()
+    sql = '''
+    INSERT INTO Reduction (valeur_reduction, id_type, id_categorie)
+    VALUES (%s, %s, %s);
+    '''
+    mycursor.execute(sql, (valeur_reduction, id_type_vetement, id_categorie_client))
+    get_db().commit()
+
+    flash("Réduction ajoutée avec succès")
+    return redirect('/reduction/show')
+
+
+@app.route('/reduction/add/categorie', methods=['GET'])
+def show_categorie():
+    type_id = request.args.get('type_id', '')
+
+    mycursor = get_db().cursor()
+    sql = '''
+        SELECT Categorie_client.id_categorie AS id, Categorie_client.libelle_categorie AS nom
+        FROM (SELECT Reduction.id_reduction, Reduction.id_categorie, Reduction.id_type
+              FROM Reduction
+              WHERE Reduction.id_type = %s) as sousrequete
+                 RIGHT JOIN Categorie_client ON sousrequete.id_type = Categorie_client.id_categorie
+        WHERE sousrequete.id_reduction IS NULL;
+        '''
+    mycursor.execute(sql, (type_id,))
+    categories = mycursor.fetchall()
+    return render_template("reduction/_categorie_client.html", categories=categories)
 
 
 @app.route('/client/add', methods=['GET'])
@@ -238,8 +323,12 @@ def add_achat():
 
 @app.route('/reduction/delete', methods=['GET'])
 def delete_reduction():
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = "DELETE FROM Reduction WHERE id_reduction = %s;"
+    mycursor.execute(sql, (id,))
+    get_db().commit()
     return redirect('/reduction/show')
-
 
 @app.route('/client/delete', methods=['GET'])
 def delete_client():
@@ -313,7 +402,41 @@ def delete_achat():
 
 @app.route('/reduction/edit', methods=['GET'])
 def edit_reduction():
-    return render_template('reduction/edit_reduction.html')
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+    sql = '''
+        SELECT id_reduction                     AS id,
+               Reduction.id_type                AS idTypeVetement,
+               Type_vetement.libelle_type AS nomTypeVetement,
+               Reduction.id_categorie           AS idRamassage,
+               Categorie_client.libelle_categorie   AS nomCategorie,
+               Reduction.valeur_reduction AS valeur
+        FROM Reduction
+                 JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+                 JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+        WHERE id_reduction = %s;
+        '''
+    mycursor.execute(sql, (id,))
+    reduction = mycursor.fetchone()
+    # TODO : Afficher message flash ?
+    return render_template('reduction/edit_reduction.html', reduction = reduction)
+
+@app.route('/reduction/edit', methods=['POST'])
+def valid_edit_reduction():
+    id = request.form['id']
+    # idCategorie = request.form['categorie_id']
+    # idTypeVetement = request.form['typeVetement_id']
+    valeur = request.form['valeur']
+
+    mycursor = get_db().cursor()
+    sql = '''
+    UPDATE Reduction SET valeur_reduction=%s WHERE id_reduction=%s;
+    '''
+    mycursor.execute(sql, (valeur, id))
+    get_db().commit()
+
+    # Afficher message flash ?
+    return redirect('/reduction/show')
 
 
 @app.route('/client/edit', methods=['GET'])

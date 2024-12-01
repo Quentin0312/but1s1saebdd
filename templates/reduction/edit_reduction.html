@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>modifier une réduction</title>
+{% endblock %}
+
+{% block body %}
+    <div class="show-head-content">
+        <h3>Modifier une réduction</h3>
+    </div>
+
+    <div class="form-container">
+        <form method="post" action="/reduction/edit">
+            <fieldset>
+                <legend>Modifier une réduction</legend>
+                <input type="hidden" name="id" value="{{ reduction.id }}" id="id">
+
+                <div class="mb-3">
+                    <label class="form-label" for="valeur">Valeur de la réduction (en %)</label><br>
+                    <input class="form-control" type="number" id="valeur" name="valeur" value="{{ reduction.valeur }}"
+                           placeholder="Saisir le pourcentage" step="5" min="0" max="9999" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="typeVetement_id">Type de vêtement</label><br>
+                    <select class="form-select" name="typeVetement_id" id="typeVetement_id" required disabled>
+                        <option value="{{ reduction.idTypeVetement }}">{{ reduction.nomTypeVetement }}</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="categorie_id">Catégorie de client</label><br>
+                    <select class="form-select" name="categorie_id" id="categorie_id" required disabled>
+                        <option value="{{ reduction.idCategorie }}">{{ reduction.nomCategorie }}</option>
+                    </select>
+                </div>
+
+                <input type="submit" value="Modifier" name="Modifier" class="btn btn-primary">
+            </fieldset>
+        </form>
+    </div>
+{% endblock %}

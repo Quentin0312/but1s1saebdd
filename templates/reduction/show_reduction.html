@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>afficher les plats</title>
+<title>afficher les réductions</title>
 {% endblock %}
 
 {% block body %}
@@ -23,14 +23,15 @@
             </tr>
         </thead>
         <tbody>
-            {% if plats | length >= 1 %}
-            {% for ligne in plats %}
+            {% if reduction | length >= 1 %}
+            {% for ligne in reduction %}
             <tr>
-                <td>{{ ligne.nomPlat }}</td>
-                <td>{{ ligne.prixPlat }}</td>
-                <td>{{ ligne.dureePreparation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
-                <td>{{ ligne.dateCreation }}</td>
+                <td>{{ ligne.valeur }}</td>
+                <td>{{ ligne.categorie }}</td>
+                <td>{{ ligne.type }}</td>
+                {# TODO : calc Prix avec/sans Réduction du type de vêtement #}
+                <td>{{ '%0.2f' | format(ligne.prixAuKgReduc|float) }} €</td>
+                <td>{{ ligne.prixAuKgSansReduc }} €</td>
                 <td>
                     <a href="/reduction/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
                     <a href="/reduction/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>

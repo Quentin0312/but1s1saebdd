@@ -1,53 +1,74 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>Ajouter une réduction</title>
+    <title>Ajouter une réduction</title>
 {% endblock %}
 
 {% block body %}
-<div class="show-head-content">
-    <h3>Ajouter une réduction</h3>
-</div>
-<div class="form-container">
-    <form method="post" action="/tri/add">
-        <fieldset>
-            <legend> Créer une réduction</legend>
-            <div class="mb-3">
-                <label for="nomPlat" class="form-label">Nom</label><br>
-                <input id="nomPlat" type="text" name="nomPlat" size="18" value="" placeholder="Saisir le nom du plat"
-                    class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="prixPlat" class="form-label">Prix</label><br>
-                <input type="number" id="prixPlat" name="prixPlat" placeholder="Saisir le prix du plat"
-                    class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="dureePreparation" class="form-label">Durée de préparation</label><br>
-                <input type="text" id="dureePreparation" name="dureePreparation"
-                    placeholder="Saisir la durée de préparation" class="form-control" required>
-            </div>
-            <div class="mb-3">
-                <label for="description" class="form-label">Description</label><br>
-                <input type="text" id="description" name="description" placeholder="Saisir la description"
-                    class="form-control">
-            </div>
-            <div class="mb-3">
-                <label for="typePlat_id" class="form-label">Type de plat</label><br>
-                <select name="typePlat_id" id="typePlat_id" class="form-select" required>
-                    <option value="">Sélectionner un type de plat</option>
-                    {% for type_plat in types_plats %}
-                    <option value={{ type_plat.id }}>{{ type_plat.nomTypePlat }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="photo" class="form-label">Image</label><br>
-                <input type="text" id="photo" name="photo" placeholder="Saisir le nom de l'image" class="form-control">
-            </div>
+    <script>
+        {#function disableQuantityInput() {#}
+        {#    document.getElementById('quantite').value = "";#}
+        {#    document.getElementById('quantite').disabled = true;#}
 
-            <input type="submit" value="Valider" name="Valider" class="btn btn-primary">
-        </fieldset>
-    </form>
-</div>
+        function getCategorieClient(e) {
+            if (e == "") {
+                html = `<label for="CatClient" class="form-label">Catégorie de client</label><br>
+                    <select name="CatClient" id="CatClient" class="form-select" required disabled>
+                        <option value="">Sélectionner une catégorie de client</option>
+                    </select>`
+                document.getElementById('categorie-select').innerHTML = html;
+                disableQuantityInput();
+
+            } else {
+                fetch('/reduction/add/categorie?id=' + e)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('categorie-select').innerHTML = html;
+                    });
+            }
+        }
+
+        {#function handleQuantity(e) {#}
+        {#    e == "" ?#}
+        {#        disableQuantityInput()#}
+        {#        : document.getElementById('quantite').disabled = false;#}
+
+    </script>
+    <div class="show-head-content">
+        <h3>Ajouter une réduction</h3>
+    </div>
+    <div class="form-container">
+        <form method="post" action="/reduction/add">
+            <fieldset>
+                <legend> Créer une réduction</legend>
+                <div class="mb-3">
+                    <label for="valReduc" class="form-label">Valeur</label><br>
+                    <input id="valReduc" type="number" name="valReduc" size="18" value=""
+                           placeholder="Saisir la valeur de la réduction"
+                           class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="TypeVetement" class="form-label">Type de vêtement</label><br>
+                    <select name="TypeVetement" id="TypeVetement" class="form-select"
+                            oninput="getCategorieClient(this.value)" required>
+                        <option value="">Sélectionner un type de vêtement</option>
+                        {% for type in types_vetements %}
+                            <option value={{ type.id }}>{{ type.type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div id="categorie-select" class="mb-3">
+                    <label for="CatClient" class="form-label">Catégorie de client</label><br>
+                    <select name="CatClient" id="CatClient" class="form-select" required disabled>
+                        <option value="">Sélectionner une catégorie de client</option>
+                    </select>
+                </div>
+
+
+                <input type="submit" value="Valider" name="Valider" class="btn btn-primary">
+            </fieldset>
+        </form>
+    </div>
 {% endblock %}
