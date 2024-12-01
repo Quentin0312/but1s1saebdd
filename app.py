@@ -445,13 +445,13 @@ def show_tri_etat():
     radarChartData = {}
 
     for elt in radarChartDatasetRaw:
-        if elt['date_ramassage'].strftime("%Y-%m-%d") in radarChartData.keys():
-            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type'] - 1] = float(
-                elt['poids_type_trie'])
-        else:
-            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")] = [0 for elt in radarChartLabels]
-            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type'] - 1] = float(
-                elt['poids_type_trie'])
+        elt_date_ramassage = elt['date_ramassage'].strftime("%Y-%m-%d")
+
+        if elt_date_ramassage not in radarChartData.keys():
+            radarChartData[elt_date_ramassage] = [0 for elt in radarChartLabels]
+
+        radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
+            elt['poids_type_trie'])
 
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
