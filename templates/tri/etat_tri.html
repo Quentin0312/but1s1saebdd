@@ -11,10 +11,35 @@
             chart.data.datasets[0].data = [];
             chart.update();
         }
+        function removeDataRadarChart(chart) {
+            chart.data.labels = [];
+            chart.data.datasets = [];
+            chart.update();
+        }
 
         function addData(chart, labels, datas) {
             chart.data.labels = labels;
             chart.data.datasets[0].data = datas;
+            chart.update();
+        }
+
+        function addDataRadarChart(chart, labels, datas) {
+            chart.data.labels = labels;
+            {#chart.data.datasets[0].data = datas;#}
+            let datasets = [];
+
+            Object.keys(datas).forEach((key => {
+                datasets.push({
+                    label: key,
+                    fill: true,
+                    backgroundColor: "rgba(179,181,198,0.2)",
+                    borderColor: "rgba(179,181,198,1)",
+                    pointBorderColor: "#fff",
+                    pointBackgroundColor: "rgba(179,181,198,1)",
+                    data: datas[key]
+                });
+            }));
+            chart.data.datasets = datasets;
             chart.update();
         }
 
@@ -47,8 +72,8 @@
                 .then(response => response.json())
                 .then(response => {
                     const result = response;
-                    removeData(radarChart);
-                    addData(radarChart, result.labels, result.data)
+                    removeDataRadarChart(radarChart);
+                    addDataRadarChart(radarChart, result.labels, result.data);
                 });
 
         }
