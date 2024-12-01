@@ -378,7 +378,6 @@ def show_client_etat():
 
 @app.route('/tri/etat', methods=['GET'])
 def show_tri_etat():
-    # dateDebut = request.args.get('dateDebut', '')
     # Bar chart
     mycursor = get_db().cursor()
     bar_chart_sql = '''
@@ -409,27 +408,13 @@ def show_tri_etat():
     pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
     pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
 
-    date_debut_pie_chart_sql = '''
-    SELECT Ramassage.date_ramassage
-    FROM Ramassage
-    ORDER BY date_ramassage
-    LIMIT 1;
-    '''
-
-    date_fin_pie_chart_sql = '''
-    SELECT Ramassage.date_ramassage
-    FROM Ramassage
-    ORDER BY date_ramassage DESC
-    LIMIT 1;
-    '''
-
-    # TODO : Radar chart
-    radar_chart_labels = '''
+    # Radar chart
+    radar_chart_labels_sql = '''
     SELECT libelle_type AS label
     FROM Type_vetement
     ORDER BY id_type;
     '''
-    mycursor.execute(radar_chart_labels)
+    mycursor.execute(radar_chart_labels_sql)
     radarChartLabelsRaw = mycursor.fetchall()
     radarChartLabels = [elt['label'] for elt in radarChartLabelsRaw]
 
@@ -452,6 +437,21 @@ def show_tri_etat():
 
         radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
             elt['poids_type_trie'])
+
+    # Filter
+    date_debut_pie_chart_sql = '''
+    SELECT Ramassage.date_ramassage
+    FROM Ramassage
+    ORDER BY date_ramassage
+    LIMIT 1;
+    '''
+
+    date_fin_pie_chart_sql = '''
+    SELECT Ramassage.date_ramassage
+    FROM Ramassage
+    ORDER BY date_ramassage DESC
+    LIMIT 1;
+    '''
 
     mycursor.execute(date_debut_pie_chart_sql)
     dateDebutResponse = mycursor.fetchone()
