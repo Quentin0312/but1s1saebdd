@@ -172,9 +172,18 @@
                             font: {
                                 size: 20
                             }
-                        }
+                        },
+                        datalabels: {
+                            anchor: 'center',
+                            align: 'center',
+                            formatter: Math.round,
+                            font: {
+                                size: 18
+                            },
+                            color: '#fff'
+                        },
                     }
-                }
+                }, plugins: [ChartDataLabels]
             });
         }
 
