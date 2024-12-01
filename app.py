@@ -16,33 +16,33 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
 
-def get_db():
-    if 'db' not in g:
-        g.db = pymysql.connect(
-            host="localhost",  # à modifier
-            user="root",  # à modifier
-            password="secret",  # à modifier
-            database="BDD_troyer2",  # à modifier
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        # à activer sur les machines personnelles :
-        # activate_db_options(g.db)
-    return g.db
-
 # def get_db():
 #     if 'db' not in g:
 #         g.db = pymysql.connect(
 #             host="localhost",  # à modifier
-#             user=username,  # à modifier
-#             password=mdp,  # à modifier
-#             database=database,  # à modifier
+#             user="root",  # à modifier
+#             password="secret",  # à modifier
+#             database="BDD_troyer2",  # à modifier
 #             charset='utf8mb4',
 #             cursorclass=pymysql.cursors.DictCursor
 #         )
 #         # à activer sur les machines personnelles :
 #         # activate_db_options(g.db)
 #     return g.db
+
+def get_db():
+    if 'db' not in g:
+        g.db = pymysql.connect(
+            host="localhost",  # à modifier
+            user=username,  # à modifier
+            password=mdp,  # à modifier
+            database=database,  # à modifier
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # à activer sur les machines personnelles :
+        # activate_db_options(g.db)
+    return g.db
 
 
 @app.teardown_appcontext
