@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    <title>Supprimer un client</title>
+{% endblock %}
+
+{% block body %}
+    <div class="show-head-content">
+        <h3>Supprimer un client</h3>
+        <span>Pour supprimer ce client, veuillez supprimer les achats liés</span>
+    </div>
+
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th>Identifiant</th>
+                <th>Date d'achat</th>
+                <th>Prix total</th>
+                <th>Actions</th>
+
+            </tr>
+            </thead>
+            <tbody>
+            {% for achat in achats %}
+                <tr>
+                    <td>{{ achat.id }}</td>
+                    <td>{{ achat.dateAchat }}</td>
+                    <td>{{ achat.prixAchat }}</td>
+                    <td>
+                        <a href="/client/fulldelete?id={{ achat.id }}&idClient={{ achat.idClient }}" class="btn btn-outline-danger">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

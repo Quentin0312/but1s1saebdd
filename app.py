@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, redirect, flash, session, g, 
 import pymysql.cursors
 # TODO : TO REMOVE !! -----------------------
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -60,8 +61,9 @@ def show_client():
                TIMESTAMPDIFF(YEAR, Client.date_naissace_client, CURRENT_DATE) AS ageClient,
                Cat.libelle_categorie AS nomCategorie
         FROM Client
-                 RIGHT JOIN Categorie_client Cat on Client.id_categorie = Cat.id_categorie
-                 ORDER BY id_client;
+        RIGHT JOIN Categorie_client Cat on Client.id_categorie = Cat.id_categorie
+        HAVING id_client IS NOT NULL
+        ORDER BY id_client;
         '''
     mycursor.execute(sql)
     clients = mycursor.fetchall()
@@ -126,7 +128,37 @@ def add_reduction():
 
 @app.route('/client/add', methods=['GET'])
 def add_client():
-    return render_template('client/add_client.html')
+    mycursor = get_db().cursor()
+    sql = '''
+        SELECT Categorie_client.id_categorie AS id, 
+            Categorie_client.libelle_categorie AS nomCategorie
+        FROM Categorie_client;
+        '''
+    mycursor.execute(sql)
+    catClient = mycursor.fetchall()
+    return render_template('client/add_client.html', catClient=catClient)
+
+
+@app.route('/client/add', methods=['POST'])
+def valid_add_client():
+    nomClient = request.form.get('nomClient')
+    prenomClient = request.form.get('prenomClient')
+    telClient = request.form.get('telClient')
+    adresseClient = request.form.get('adresseClient')
+    emailClient = request.form.get('emailClient')
+    dateClient = request.form.get('dateClient')
+    dateClient = datetime.strptime(dateClient, '%Y-%m-%d').date()
+    idCategorie = request.form.get('idCategorie')
+
+    mycursor = get_db().cursor()
+    sql = ''' INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
+                    date_naissace_client,
+                    id_categorie) VALUES (NULL, %s, %s, %s, %s, %s, %s, %s);'''
+    tuple_sql = (nomClient, prenomClient, telClient, adresseClient, emailClient, dateClient, idCategorie)
+    mycursor.execute(sql, tuple_sql)
+    get_db().commit()
+
+    return redirect('/client/show')
 
 
 @app.route('/tri/add', methods=['GET'])
@@ -211,7 +243,54 @@ def delete_reduction():
 
 @app.route('/client/delete', methods=['GET'])
 def delete_client():
-    return redirect('/client/show')
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+
+    sql =  "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
+    mycursor.execute(sql, (id,))
+    achats = mycursor.fetchall()
+
+    if achats :
+        return render_template('client/delete_client.html', achats=achats)
+
+    else :
+        sql = "DELETE FROM Client WHERE id_client = %s;"
+        mycursor.execute(sql, (id,))
+        get_db().commit()
+
+        return redirect('/client/show')
+
+@app.route('/client/fulldelete', methods=['GET'])
+def fulldelete_client():
+    id = request.args.get('id')
+    idClient = request.args.get('idClient')
+    mycursor = get_db().cursor()
+
+    sql = "SELECT id_type, id_achat FROM Concerne WHERE id_achat = %s;"
+    mycursor.execute(sql, (id,))
+    concerne = mycursor.fetchall()
+
+    if concerne :
+        sql = "DELETE FROM Concerne WHERE id_achat = %s;"
+        mycursor.execute(sql, (id,))
+        get_db().commit()
+
+    sql = "DELETE FROM Achat WHERE id_achat = %s;"
+    mycursor.execute(sql, (id,))
+    get_db().commit()
+
+    sql =  "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
+    mycursor.execute(sql, (idClient,))
+    achats = mycursor.fetchall()
+
+    if achats :
+        return render_template('client/delete_client.html', achats=achats)
+
+    else :
+        sql = "DELETE FROM Client WHERE id_client = %s;"
+        mycursor.execute(sql, (idClient,))
+        get_db().commit()
+        return redirect('/client/show')
 
 
 @app.route('/tri/delete', methods=['GET'])
@@ -366,8 +445,9 @@ def show_tri_etat():
     for elt in radarChartDatasetRaw:
         print(elt)
         if elt['date_ramassage'].strftime("%Y-%m-%d") in radarChartData.keys():
-            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type']-1] = float(elt['poids_type_trie'])
-        else :
+            radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")][elt['id_type'] - 1] = float(
+                elt['poids_type_trie'])
+        else:
             radarChartData[elt['date_ramassage'].strftime("%Y-%m-%d")] = [0 for elt in radarChartLabels]
 
     mycursor.execute(date_debut_pie_chart_sql)
