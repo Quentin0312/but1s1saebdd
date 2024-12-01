@@ -73,20 +73,23 @@
 
         }
     </script>
-    <div class="show-head-content">
-        <h3>État de Tri</h3>
+    <div style="display: flex; justify-content: space-between">
+        <div class="show-head-content">
+            <h3>État de Tri</h3>
+        </div>
+        <div>
+            <div>{{ "Filtre :" }}</div>
+            <label for="start-date">Date de début:</label>
+            <input type="date" id="start-date" name="trip-start" value="{{ dateDebut | safe }}"
+                   min="{{ dateDebut | safe }}"
+                   max="{{ dateFin | safe }}"/>
+            <label for="end-date">Date de fin:</label>
+            <input type="date" id="end-date" name="trip-start" value="{{ dateFin | safe }}" min="{{ dateDebut | safe }}"
+                   max="{{ dateFin | safe }}"/>
+            <button type="button" onclick="filterPieChart()" class="btn btn-primary">Valider</button>
+        </div>
     </div>
-    <div>
-        <div>{{ "Filtre :" }}</div>
-        <label for="start-date">Date de début:</label>
-        <input type="date" id="start-date" name="trip-start" value="{{ dateDebut | safe }}"
-               min="{{ dateDebut | safe }}"
-               max="{{ dateFin | safe }}"/>
-        <label for="end-date">Date de fin:</label>
-        <input type="date" id="end-date" name="trip-start" value="{{ dateFin | safe }}" min="{{ dateDebut | safe }}"
-               max="{{ dateFin | safe }}"/>
-        <button onclick="filterPieChart()">Valider</button>
-    </div>
+
 
     <div style="display: flex;justify-content: center;height: 500px; width: 100%">
         <canvas id="bar-chart" width="100%" height="100%"></canvas>
