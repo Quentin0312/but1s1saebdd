@@ -15,6 +15,7 @@ app = Flask(__name__)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
+
 # def get_db():
 #     if 'db' not in g:
 #         g.db = pymysql.connect(
@@ -74,6 +75,7 @@ def show_reduction():
     reduction = mycursor.fetchall()
     print(reduction)
     return render_template('reduction/show_reduction.html', reduction=reduction)
+
 
 @app.route('/client/show', methods=['GET'])
 def show_client():
@@ -329,6 +331,7 @@ def delete_reduction():
     get_db().commit()
     return redirect('/reduction/show')
 
+
 @app.route('/client/delete', methods=['GET'])
 def delete_client():
     id = request.args.get('id')
@@ -418,7 +421,8 @@ def edit_reduction():
     mycursor.execute(sql, (id,))
     reduction = mycursor.fetchone()
     # TODO : Afficher message flash ?
-    return render_template('reduction/edit_reduction.html', reduction = reduction)
+    return render_template('reduction/edit_reduction.html', reduction=reduction)
+
 
 @app.route('/reduction/edit', methods=['POST'])
 def valid_edit_reduction():
@@ -466,6 +470,7 @@ def edit_client():
     catClient = mycursor.fetchall()
 
     return render_template('client/edit_client.html', client=client, catClient=catClient)
+
 
 @app.route('/client/edit', methods=['POST'])
 def valid_edit_client():
@@ -606,6 +611,14 @@ def show_tri_etat():
         radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
             elt['poids_type_trie'])
 
+    # Total quantity
+    total_qty_sql = '''
+    SELECT SUM(poids_type_trie) AS total
+    FROM Tri;
+    '''
+    mycursor.execute(total_qty_sql)
+    total_qty_raw = mycursor.fetchone()
+    total_qty = str(total_qty_raw['total'])
     # Filter
     date_debut_pie_chart_sql = '''
     SELECT Ramassage.date_ramassage
@@ -631,7 +644,8 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
-                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData)
+                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData,
+                           total_qty=total_qty)
 
 
 @app.route('/tri/etat/piechart', methods=['GET'])
@@ -658,6 +672,7 @@ def get_piechart_filtered_data():
         "data": pieChartData
     })
     return result
+
 
 @app.route('/tri/etat/barchart', methods=['GET'])
 def get_barchart_filtered_data():
@@ -686,6 +701,7 @@ def get_barchart_filtered_data():
         "data": barChartData
     })
     return result
+
 
 @app.route('/tri/etat/radarchart', methods=['GET'])
 def get_radarchart_filtered_data():
@@ -731,6 +747,27 @@ def get_radarchart_filtered_data():
     })
 
     return result
+
+
+@app.route('/tri/etat/total', methods=['GET'])
+def get_total_filtered_data():
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
+
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT SUM(poids_type_trie) AS total
+    FROM Tri
+             JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
+    WHERE date_ramassage BETWEEN %s AND %s;
+    '''
+    mycursor.execute(sql, (date_debut, date_fin))
+    rawResponse = mycursor.fetchone()
+    total = rawResponse['total']
+
+    return jsonify({
+        "total": total
+    })
 
 
 @app.route('/achat/etat', methods=['GET'])
