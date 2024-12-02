@@ -2,7 +2,6 @@ from flask import Flask, request, render_template, redirect, flash, session, g, 
 import pymysql.cursors
 # TODO : TO REMOVE !! -----------------------
 from dotenv import load_dotenv
-from datetime import datetime
 import os
 
 load_dotenv()
@@ -16,34 +15,34 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
 
-def get_db():
-    if 'db' not in g:
-        g.db = pymysql.connect(
-            host="serveurmysql",  # à modifier
-            user="kouadah",  # à modifier
-            password="mdp",  # à modifier
-            database="BDD_kouadah_sae",  # à modifier
-            charset='utf8mb4',
-            cursorclass=pymysql.cursors.DictCursor
-        )
-        # à activer sur les machines personnelles :
-        # activate_db_options(g.db)
-    return g.db
-
-
 # def get_db():
 #     if 'db' not in g:
 #         g.db = pymysql.connect(
 #             host="localhost",  # à modifier
-#             user=username,  # à modifier
-#             password=mdp,  # à modifier
-#             database=database,  # à modifier
+#             user="root",  # à modifier
+#             password="secret",  # à modifier
+#             database="BDD_troyer2",  # à modifier
 #             charset='utf8mb4',
 #             cursorclass=pymysql.cursors.DictCursor
 #         )
 #         # à activer sur les machines personnelles :
 #         # activate_db_options(g.db)
 #     return g.db
+
+
+def get_db():
+    if 'db' not in g:
+        g.db = pymysql.connect(
+            host="localhost",  # à modifier
+            user=username,  # à modifier
+            password=mdp,  # à modifier
+            database=database,  # à modifier
+            charset='utf8mb4',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+        # à activer sur les machines personnelles :
+        # activate_db_options(g.db)
+    return g.db
 
 
 @app.teardown_appcontext
@@ -641,7 +640,190 @@ def show_client_etat():
     mycursor.execute(sql)
     catClient = mycursor.fetchall()
 
-    return render_template('/client/etat_client.html', catClient=catClient)
+    client_sql = '''
+                    SELECT Client.id_client AS id, Client.nom_client AS nomClient, 
+                            Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
+                    FROM Client
+                    JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+                    GROUP BY Client.id_client
+                    ORDER BY Client.id_client;
+                    '''
+    mycursor.execute(client_sql)
+    clients = mycursor.fetchall()
+
+    # Charger les données pour le graphique à barres
+    bar_chart_sql = '''
+            SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Achat.id_achat) AS nbrAchats
+            FROM Client
+            RIGHT JOIN Achat ON Client.id_client = Achat.id_client
+            RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Client.id_client IS NOT NULL
+            GROUP BY Categorie_client.id_categorie
+            ORDER BY Categorie_client.id_categorie;
+            '''
+    mycursor.execute(bar_chart_sql)
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['nomCategorie'] for elt in barChartRaw]
+    barChartData = [elt['nbrAchats'] for elt in barChartRaw]
+
+    # Charger les données pour le graphique en camembert
+    pie_chart_sql = '''
+            SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Client.id_client) AS nbrClients
+            FROM Client
+            RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Client.id_client IS NOT NULL
+            GROUP BY Categorie_client.id_categorie;
+            '''
+    mycursor.execute(pie_chart_sql)
+    pieChartRaw = mycursor.fetchall()
+    pieChartLabels = [elt['nomCategorie'] for elt in pieChartRaw]
+    pieChartData = [elt['nbrClients'] for elt in pieChartRaw]
+
+    return render_template(
+        'client/etat_client.html',
+        barChartLabels=barChartLabels,
+        barChartData=barChartData,
+        pieChartLabels=pieChartLabels,
+        pieChartData=pieChartData,
+        catClient=catClient,
+        clients=clients
+    )
+
+
+@app.route('/client/etat/barchart', methods=['GET'])
+def client_get_barchart_filtered_data():
+    categories = request.args.get('categories', '')  # Catégories sélectionnées sous forme de chaîne CSV
+    minPrice = int(request.args.get('min', ''))  # Prix minimal sélectionné
+    maxPrice = int(request.args.get('max', ''))  # Prix maximal sélectionné
+    category_ids = [int(id) for id in categories.split(',')] if categories else []
+
+    mycursor = get_db().cursor()
+
+    # Construction de la requête SQL
+    if category_ids:
+        # Filtrer par catégories et par prix
+        placeholders_categories = ','.join(['%s'] * len(category_ids))
+
+        sql = f'''
+                SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Achat.id_achat) AS nbrAchats
+                FROM Client
+                RIGHT JOIN Achat ON Client.id_client = Achat.id_client
+                RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+                WHERE Client.id_categorie IN ({placeholders_categories})
+                AND Achat.prix_total BETWEEN %s AND %s
+                AND Client.id_client IS NOT NULL
+                GROUP BY Categorie_client.id_categorie
+                ORDER BY Categorie_client.id_categorie;
+                '''
+        tuple_sql = (*category_ids, minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+    else:
+        sql = f'''
+                SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Achat.id_achat) AS nbrAchats
+                FROM Client
+                RIGHT JOIN Achat ON Client.id_client = Achat.id_client
+                RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+                WHERE Achat.prix_total BETWEEN %s AND %s
+                AND Client.id_client IS NOT NULL
+                GROUP BY Categorie_client.id_categorie
+                ORDER BY Categorie_client.id_categorie;
+                '''
+        tuple_sql = (minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+
+    result = mycursor.fetchall()
+    labels = [row['nomCategorie'] for row in result]
+    data = [row['nbrAchats'] for row in result]
+
+    return jsonify({'labels': labels, 'data': data})
+
+
+@app.route('/client/etat/piechart', methods=['GET'])
+def client_get_piechart_filtered_data():
+    categories = request.args.get('categories', '')  # Catégories sélectionnées sous forme de chaîne CSV
+    minPrice = int(request.args.get('min', ''))  # Prix minimal sélectionné
+    maxPrice = int(request.args.get('max', ''))  # Prix maximal sélectionné
+    category_ids = [int(id) for id in categories.split(',')] if categories else []
+
+    mycursor = get_db().cursor()
+
+    # Construction de la requête SQL
+    if category_ids:
+        # Filtrer par catégories et par prix
+        placeholders_categories = ','.join(['%s'] * len(category_ids))
+
+        sql = f'''
+            SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Client.id_client) AS nbrClients
+            FROM Client
+            RIGHT JOIN Achat ON Client.id_client = Achat.id_client
+            RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Categorie_client.id_categorie IN ({placeholders_categories})
+            AND Achat.prix_total BETWEEN %s AND %s
+            AND Client.id_client IS NOT NULL
+            GROUP BY Categorie_client.id_categorie;
+                    '''
+        tuple_sql = (*category_ids, minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+    else:
+        sql = '''
+            SELECT Categorie_client.libelle_categorie AS nomCategorie, COUNT(Client.id_client) AS nbrClients
+            FROM Client
+            RIGHT JOIN Achat ON Client.id_client = Achat.id_client
+            RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Achat.prix_total BETWEEN %s AND %s
+            AND Client.id_client IS NOT NULL
+            GROUP BY Categorie_client.id_categorie;
+                    '''
+        tuple_sql = (minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+
+    result = mycursor.fetchall()
+    labels = [row['nomCategorie'] for row in result]
+    data = [row['nbrClients'] for row in result]
+
+    return jsonify({
+        "labels": labels,
+        "data": data
+    })
+
+@app.route('/client/etat/table', methods=['GET'])
+def get_table_filtered_data():
+    categories = request.args.get('categories', '')
+    minPrice = int(request.args.get('min', ''))
+    maxPrice = int(request.args.get('max', ''))
+    category_ids = [int(id) for id in categories.split(',')] if categories else []
+
+    mycursor = get_db().cursor()
+
+    if category_ids:
+        placeholders_categories = ','.join(['%s'] * len(category_ids))
+        sql = f'''
+            SELECT Client.id_client AS id, Client.nom_client AS nomClient, Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
+            FROM Client
+            JOIN Achat ON Client.id_client = Achat.id_client
+            JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Client.id_categorie IN ({placeholders_categories})
+            AND Achat.prix_total BETWEEN %s AND %s
+            GROUP BY Client.id_client
+            ORDER BY Client.id_client;
+        '''
+        tuple_sql = (*category_ids, minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+    else:
+        sql = '''
+            SELECT Client.id_client AS id, Client.nom_client AS nomClient, Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
+            FROM Client
+            JOIN Achat ON Client.id_client = Achat.id_client
+            JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
+            WHERE Achat.prix_total BETWEEN %s AND %s
+            GROUP BY Client.id_client
+            ORDER BY Client.id_client;
+        '''
+        tuple_sql = (minPrice, maxPrice)
+        mycursor.execute(sql, tuple_sql)
+
+    result = mycursor.fetchall()
+    return jsonify(result)
 
 
 @app.route('/tri/etat', methods=['GET'])
