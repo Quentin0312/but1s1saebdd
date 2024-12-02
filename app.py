@@ -116,7 +116,6 @@ def show_tri():
     '''
     mycursor.execute(sql)
     tris = mycursor.fetchall()
-    print(tris)
     return render_template('tri/show_tri.html', tris=tris)
 
 
@@ -249,8 +248,6 @@ def valid_add_client():
 @app.route('/tri/add', methods=['GET'])
 def add_tri():
     mycursor = get_db().cursor()
-    # Récupère uniquement les ramassages dont il est encore possible d'ajouter un tri
-    # TODO : Fix bug quand essaie d'ajouter alors que pas de tri !
     sql = '''
     SELECT sous_requete.id_ramassage AS id, Ramassage.date_ramassage AS date
     FROM (SELECT Ramassage.id_ramassage, COUNT(Tri.id_type) AS count
@@ -264,7 +261,7 @@ def add_tri():
     ramassages = mycursor.fetchall()
 
     if len(ramassages) == 0:
-        # Rewrite the message
+        # TODO : Enhance message
         flash(
             "Tout les types de vêtements sont traités dans tout les ramassages, pour ajouter un tri, veuillez d'abord un supprimer un !",
             'alert-danger')
@@ -286,7 +283,6 @@ def valid_add_tri():
     '''
     mycursor.execute(sql, (id_type, id_ramassage, poids,))
     get_db().commit()
-    # TODO : Afficher message flash
     return redirect('/tri/show')
 
 
@@ -509,15 +505,12 @@ def edit_tri():
     '''
     mycursor.execute(sql, (id,))
     tri = mycursor.fetchone()
-    # TODO : Afficher message flash ?
     return render_template('tri/edit_tri.html', tri=tri)
 
 
 @app.route('/tri/edit', methods=['POST'])
 def valid_edit_tri():
     id = request.form['id']
-    # idRamassage = request.form['ramassage_id']
-    # idTypeVetement = request.form['typeVetement_id']
     quantite = request.form['quantite']
 
     mycursor = get_db().cursor()
@@ -527,7 +520,6 @@ def valid_edit_tri():
     mycursor.execute(sql, (quantite, id))
     get_db().commit()
 
-    # Afficher message flash ?
     return redirect('/tri/show')
 
 
@@ -704,7 +696,14 @@ def show_tri_etat():
 
         radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
             elt['poids_type_trie'])
-
+    # Total quantity
+    total_qty_sql = '''
+    SELECT SUM(poids_type_trie) AS total
+    FROM Tri;
+    '''
+    mycursor.execute(total_qty_sql)
+    total_qty_raw = mycursor.fetchone()
+    total_qty = str(total_qty_raw['total'])
     # Filter
     date_debut_pie_chart_sql = '''
     SELECT Ramassage.date_ramassage
@@ -730,7 +729,8 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
-                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData)
+                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData,
+                           total_qty=total_qty)
 
 
 @app.route('/tri/etat/piechart', methods=['GET'])
@@ -752,11 +752,10 @@ def get_piechart_filtered_data():
     pieChartRaw = mycursor.fetchall()
     pieChartLabels = [elt['typeVetement'] for elt in pieChartRaw]
     pieChartData = [str(elt['poidsTotal']) for elt in pieChartRaw]
-    result = jsonify({
+    return jsonify({
         "labels": pieChartLabels,
         "data": pieChartData
     })
-    return result
 
 
 @app.route('/tri/etat/barchart', methods=['GET'])
@@ -781,11 +780,10 @@ def get_barchart_filtered_data():
     barChartData = [elt['poidsTotal'] for elt in barChartRaw]
     barChartData = [str(elt) for elt in barChartData]
 
-    result = jsonify({
+    return jsonify({
         "labels": barChartLabels,
         "data": barChartData
     })
-    return result
 
 
 @app.route('/tri/etat/radarchart', methods=['GET'])
@@ -826,12 +824,31 @@ def get_radarchart_filtered_data():
         radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
             elt['poids_type_trie'])
 
-    result = jsonify({
+    return jsonify({
         "labels": radarChartLabels,
         "data": radarChartData
     })
 
-    return result
+
+@app.route('/tri/etat/total', methods=['GET'])
+def get_total_filtered_data():
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
+
+    mycursor = get_db().cursor()
+    sql = '''
+    SELECT SUM(poids_type_trie) AS total
+    FROM Tri
+             JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
+    WHERE date_ramassage BETWEEN %s AND %s;
+    '''
+    mycursor.execute(sql, (date_debut, date_fin))
+    rawResponse = mycursor.fetchone()
+    total = rawResponse['total']
+
+    return jsonify({
+        "total": total
+    })
 
 
 @app.route('/achat/etat', methods=['GET'])
