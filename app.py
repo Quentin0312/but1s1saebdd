@@ -548,7 +548,7 @@ def show_reduction_etat():
     JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
     JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
     GROUP BY Type_vetement.libelle_type, Categorie_client.libelle_categorie
-    ORDER BY Reduction.valeur_reduction DESC;
+    ORDER BY maxReduction DESC;
     '''
     mycursor.execute(stats)
     stats = mycursor.fetchone()
