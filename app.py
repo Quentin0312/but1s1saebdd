@@ -206,7 +206,7 @@ def show_categorie():
     used_categories = {row['id'] for row in mycursor.fetchall()}
     for category in all_categories:
         category['disabled'] = category['id'] in used_categories
-
+    # Envoie le dictionnaire all_categories sous forme d'un JSON, -> chq catégories inclut l'id, le nom et disable (bool)
     return jsonify({'categories': all_categories}), 200
 
 
@@ -429,9 +429,10 @@ def edit_reduction():
 @app.route('/reduction/edit', methods=['POST'])
 def valid_edit_reduction():
     id = request.form['id']
+    valeur = request.form['valeur']
+    # Pas nécessaire de changer la catégorie et le type => add si veux créer une toute autre réduction
     # idCategorie = request.form['categorie_id']
     # idTypeVetement = request.form['typeVetement_id']
-    valeur = request.form['valeur']
 
     mycursor = get_db().cursor()
     sql = '''
@@ -540,9 +541,21 @@ def edit_achat():
 def show_reduction_etat():
     mycursor = get_db().cursor()
 
+    # Stats
+    stats = '''
+    SELECT Type_vetement.libelle_type AS nomTypeVetement, Categorie_client.libelle_categorie AS nomCategorie,
+    MAX(Reduction.valeur_reduction) AS maxReduction FROM Reduction
+    JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+    JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+    GROUP BY Type_vetement.libelle_type, Reduction.id_categorie
+    ORDER BY Reduction.valeur_reduction DESC;
+    '''
+    mycursor.execute(stats)
+    stats = mycursor.fetchone()
+
     # Charger les données pour le graphique à barres
     bar_chart_sql = '''
-    SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+    SELECT Type_vetement.libelle_type AS typeVetement, AVG(Reduction.valeur_reduction) AS totalReduction
     FROM Reduction
     JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
     GROUP BY Reduction.id_type
@@ -555,7 +568,7 @@ def show_reduction_etat():
 
     # Charger les données pour le graphique en camembert
     pie_chart_sql = '''
-    SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction
+    SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction, COUNT(Reduction.valeur_reduction) AS nbReduction
     FROM Reduction
     JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
     GROUP BY Reduction.id_categorie
@@ -564,7 +577,9 @@ def show_reduction_etat():
     mycursor.execute(pie_chart_sql)
     pieChartRaw = mycursor.fetchall()
     pieChartLabels = [elt['categorie'] for elt in pieChartRaw]
-    pieChartData = [elt['totalReduction'] for elt in pieChartRaw]
+    pieChartDataSum = [elt['totalReduction'] for elt in pieChartRaw]
+    pieChartDataCount = [elt['nbReduction'] for elt in pieChartRaw]
+
 
     # Charger la liste des catégories pour le filtre
     categories_sql = 'SELECT id_categorie AS id, libelle_categorie AS libelle FROM Categorie_client;'
@@ -573,14 +588,16 @@ def show_reduction_etat():
 
     return render_template(
         '/reduction/etat_reduction.html',
+        stats=stats,
         barChartLabels=barChartLabels,
         barChartData=barChartData,
         pieChartLabels=pieChartLabels,
-        pieChartData=pieChartData,
+        pieChartDataSum=pieChartDataSum,
+        pieChartDataCount=pieChartDataCount,
         categories=categories
     )
 
-
+# Graphs repris sur Quentin
 @app.route('/reduction/etat/barchart', methods=['GET'])
 def reduction_get_barchart_filtered_data():
     categories = request.args.get('categories')

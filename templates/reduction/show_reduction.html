@@ -29,7 +29,6 @@
                 <td>{{ ligne.valeur }}</td>
                 <td>{{ ligne.categorie }}</td>
                 <td>{{ ligne.type }}</td>
-                {# TODO : calc Prix avec/sans Réduction du type de vêtement #}
                 <td>{{ '%0.2f' | format(ligne.prixAuKgReduc|float) }} €</td>
                 <td>{{ ligne.prixAuKgSansReduc }} €</td>
                 <td>

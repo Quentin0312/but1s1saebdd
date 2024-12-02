@@ -2,34 +2,51 @@
 
 {% block title %}
     <title>Ajouter une réduction</title>
+    <style>html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+    }</style>
 {% endblock %}
 
 {% block body %}
     <div class="show-head-content">
         <h3>État des Réductions</h3>
-    </div>
-
-    <div style="position:absolute;display: flex; justify-content: space-between">
-        <div class="card show-head-content form-group mr-3" style="width: 300px;">
-            <div class="form-group mr-3 card-body">
-                <h3 for="filter_items" class="card-title">Sélectionner des catégories :</h3>
-                {% for category in categories %}
-                    <div class="form-check">
-                        <input type="checkbox" name="filter_items" value="{{ category.id }}"
-                               class="form-check-input category-checkbox">
-                        <label class="form-check-label chckbx">{{ category.libelle }}</label>
-                    </div>
-                {% endfor %}
-            </div>
-
-            <button type="button" onclick="filterBarChart()" class="btn btn-primary">Valider</button>
+        <div style="display: flex; width: px; padding: 10px" class="card form-group mr-3">
+            <p>La plus grande réduction est : <strong>{{ stats.maxReduction }}</strong>%, pour le type de vêtement :
+                <strong>{{ stats.nomTypeVetement }}</strong>, pour la catégorie :
+                <strong>{{ stats.nomCategorie }}</strong></p>
         </div>
     </div>
 
-    <div style="display: flex;justify-content: space-evenly;height: 500px; width: 100%; margin-top: 50px; margin-left: 150px">
-        <canvas id="barChart" width="100%" height="100%"></canvas>
-        <canvas id="pieChart" width="100%" height="100%"></canvas>
+
+    <div style="border:#e4e4e4 solid 2px; position:absolute; border-radius: 10px; max-width: 1000px; margin-left: 20px; justify-items: center; padding-top: 20px">
+        <div style="position:absolute;display: flex; justify-content: space-between">
+            <div class="card show-head-content form-group mr-3" style="width: 300px;">
+                <div class="form-group mr-3 card-body">
+                    <h3 for="filter_items" class="card-title">Sélectionner des catégories :</h3>
+                    {% for category in categories %}
+                        <div class="form-check">
+                            <input type="checkbox" name="filter_items" value="{{ category.id }}"
+                                   class="form-check-input category-checkbox">
+                            <label class="form-check-label chckbx">{{ category.libelle }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="button" onclick="filterBarChart()" class="btn btn-primary">Valider</button>
+            </div>
+        </div>
+        <div style="display: flex;justify-content: space-evenly;height: 500px; width: 600px; margin: 10px 50px 50px 375px">
+            <canvas id="barChart" width="100%" height="100%"></canvas>
+        </div>
     </div>
+
+    <div style="display: flex; float: right; height: 500px; width: 30%; margin: 20px 100px">
+        <canvas id="pieChart" width="100%" height="100%"></canvas>
+
+        <button type="button" style="position: absolute; top: 86.5%; width:500px" class="btn btn-outline-primary" id="toggleChart">Sans nombre de réduction</button>
+    </div>
+
 
     <script>
         // settings, couleur, etc
@@ -39,7 +56,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: "Total des Réductions (en %)",
+                        label: "Moyenne des Réductions (en %)",
                         backgroundColor: "rgba(75, 192, 192, 0.2)",
                         borderColor: "rgba(75, 192, 192, 1)",
                         borderWidth: 1,
@@ -50,7 +67,7 @@
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Réductions par type de vêtement',
+                            text: 'Moyenne des réductions par type de vêtement',
                             font: {
                                 size: 20
                             }
@@ -60,18 +77,38 @@
             });
         }
 
-        function setupPieChart(labels, data) {
-            return new Chart(document.getElementById("pieChart"), {
-                type: 'pie',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: "Total des réduction (en %)",
+        let chartType = 'pie'; // chartType de base
+        function setupPieOrDoughnutChart(labels, data1, data2, type) {
+            const datasets = type === 'pie'
+                ? [{
+                    label: "Total des réductions (en %)",
+                    backgroundColor: ["#da5d5d", "#fbbc69", "#96ed73", "#85e8d6", "#c45850"],
+                    borderColor: "#fff",
+                    borderWidth: 2,
+                    data: data1
+                }]
+                : [
+                    {
+                        label: "Total des réductions (en %)",
                         backgroundColor: ["#da5d5d", "#fbbc69", "#96ed73", "#85e8d6", "#c45850"],
                         borderColor: "#fff",
-                        borderWidth: 3,
-                        data: data
-                    }]
+                        borderWidth: 2,
+                        data: data1
+                    },
+                    {
+                        label: "Nombre de réductions",
+                        backgroundColor: ["#ffc0cb", "#ffe4b5", "#90ee90", "#afeeee", "#d3a4a4"],
+                        borderColor: "#fff",
+                        borderWidth: 2,
+                        data: data2
+                    }
+                ];
+
+            return new Chart(document.getElementById("pieChart"), {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
                     plugins: {
@@ -81,21 +118,57 @@
                             font: {
                                 size: 20
                             }
+                        },
+                        subtitle: {
+                            display: true,
+                            text: 'Total des pourcentage de réduction pour chaque catégorie de clients',
+                            font: {
+                                size: 15
+                            }
                         }
                     }
                 }
             });
         }
 
+        document.getElementById("toggleChart").addEventListener("click", function () {
+            // Destroy the current chart instance
+            pieChart.destroy();
+
+            // Toggle chart type
+            chartType = chartType === 'pie' ? 'doughnut' : 'pie';
+
+            // Update button text
+            this.textContent = chartType === 'pie' ? "Sans nombre de réduction" : "Avec nombre de réduction";
+
+            // Recreate the chart with the new type
+            pieChart = setupPieOrDoughnutChart(
+                {{ pieChartLabels | tojson }},
+                {{ pieChartDataSum | tojson }},
+                {{ pieChartDataCount | tojson }},
+                chartType
+            );
+        });
+
         // Init des graphs avec données Flask
-        const barChart = setupBarChart({{ barChartLabels | tojson }}, {{ barChartData | tojson }});
-        const pieChart = setupPieChart({{ pieChartLabels | tojson }}, {{ pieChartData | tojson }});
+        const barChart = setupBarChart(
+            {{ barChartLabels | tojson }},
+            {{ barChartData | tojson }}
+        );
+
+        let pieChart = setupPieOrDoughnutChart(
+            {{ pieChartLabels | tojson }},
+            {{ pieChartDataSum | tojson }},
+            {{ pieChartDataCount | tojson }},
+            chartType
+        );
 
         function getSelectedValues(className) {
             return Array.from(document.getElementsByClassName(className))
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => checkbox.value);
         }
+
         // Filtre pour graph à barres/bâton
         async function filterBarChart() {
             const selectedCategories = getSelectedValues('category-checkbox');
