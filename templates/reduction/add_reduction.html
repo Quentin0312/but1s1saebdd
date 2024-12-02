@@ -49,6 +49,7 @@
                            class="form-control" required>
                 </div>
 
+                {# Selection d'un type de vêtement #}
                 <div class="mb-3">
                     <label for="TypeVetement" class="form-label">Type de vêtement</label><br>
                     <select name="TypeVetement" id="TypeVetement" class="form-select"
@@ -60,6 +61,7 @@
                     </select>
                 </div>
 
+                {# Selection d'une catégorie cliente disponible pour le type de vêtement selectionné #}
                 <div id="categorie-select" class="mb-3">
                     <label for="CatClient" class="form-label">Catégorie de client</label><br>
                     <select name="CatClient" id="CatClient" class="form-select" required>
@@ -67,8 +69,8 @@
                     </select>
                 </div>
 
-
                 <input type="submit" value="Valider" name="Valider" class="btn btn-primary">
+
             </fieldset>
         </form>
     </div>

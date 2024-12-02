@@ -16,34 +16,34 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.secret_key = 'une cle(token) : grain de sel(any random string)'
 
 
-# def get_db():
-#     if 'db' not in g:
-#         g.db = pymysql.connect(
-#             host="localhost",  # à modifier
-#             user="root",  # à modifier
-#             password="secret",  # à modifier
-#             database="BDD_troyer2",  # à modifier
-#             charset='utf8mb4',
-#             cursorclass=pymysql.cursors.DictCursor
-#         )
-#         # à activer sur les machines personnelles :
-#         # activate_db_options(g.db)
-#     return g.db
-
-
 def get_db():
     if 'db' not in g:
         g.db = pymysql.connect(
             host="localhost",  # à modifier
-            user=username,  # à modifier
-            password=mdp,  # à modifier
-            database=database,  # à modifier
+            user="root",  # à modifier
+            password="secret",  # à modifier
+            database="BDD_troyer2",  # à modifier
             charset='utf8mb4',
             cursorclass=pymysql.cursors.DictCursor
         )
         # à activer sur les machines personnelles :
         # activate_db_options(g.db)
     return g.db
+
+
+# def get_db():
+#     if 'db' not in g:
+#         g.db = pymysql.connect(
+#             host="localhost",  # à modifier
+#             user=username,  # à modifier
+#             password=mdp,  # à modifier
+#             database=database,  # à modifier
+#             charset='utf8mb4',
+#             cursorclass=pymysql.cursors.DictCursor
+#         )
+#         # à activer sur les machines personnelles :
+#         # activate_db_options(g.db)
+#     return g.db
 
 
 @app.teardown_appcontext
@@ -74,7 +74,6 @@ def show_reduction():
         '''
     mycursor.execute(sql)
     reduction = mycursor.fetchall()
-    print(reduction)
     return render_template('reduction/show_reduction.html', reduction=reduction)
 
 
@@ -154,8 +153,6 @@ def valid_add_achat():
 @app.route('/reduction/add', methods=['GET'])
 def add_reduction():
     mycursor = get_db().cursor()
-
-    # TODO : Fix bug quand essaie d'ajouter alors que pas de tri !
     sql = '''
         SELECT sous_requete.id_type AS id, Type_vetement.libelle_type AS type
         FROM (SELECT Type_vetement.id_type, COUNT(Reduction.id_type) AS count
@@ -168,22 +165,17 @@ def add_reduction():
     mycursor.execute(sql)
     types_vetements = mycursor.fetchall()
 
-    if len(types_vetements) == 0:
-        flash(
-            "Tout les types de vêtements sont déjà tous associés a toutes les catégories, pour en ajouter une réduction, veuillez d'abord un supprimer une !",
-            'alert-danger')
-        return redirect('/reduction/show')
     return render_template('reduction/add_reduction.html', types_vetements=types_vetements)
 
 
 @app.route('/reduction/add', methods=['POST'])
 def valid_add_reduction():
-    # Récupérer les données du formulaire
+    # Recup données formulaire
     valeur_reduction = request.form['valReduc']
     id_type_vetement = request.form['TypeVetement']
     id_categorie_client = request.form['CatClient']
 
-    # Insertion de la réduction dans la base de données
+    # Insert nv reduc ds bdd
     mycursor = get_db().cursor()
     sql = '''
     INSERT INTO Reduction (valeur_reduction, id_type, id_categorie)
@@ -192,22 +184,21 @@ def valid_add_reduction():
     mycursor.execute(sql, (valeur_reduction, id_type_vetement, id_categorie_client))
     get_db().commit()
 
-    flash("Réduction ajoutée avec succès")
     return redirect('/reduction/show')
 
 
 @app.route('/reduction/add/categorie', methods=['GET'])
 def show_categorie():
     type_id = request.args.get('type_id', '')
-
+    # Select tts les catégories
     mycursor = get_db().cursor()
-    # Récupérer toutes les catégories
     sql_all_categories = '''
         SELECT Categorie_client.id_categorie AS id, Categorie_client.libelle_categorie AS nom
         FROM Categorie_client;
     '''
     mycursor.execute(sql_all_categories)
     all_categories = mycursor.fetchall()
+    # Select tts les catégories déjà utilisées => disable l'ajout pour celles ci
     sql_used_categories = '''
         SELECT Reduction.id_categorie AS id
         FROM Reduction
@@ -428,7 +419,6 @@ def edit_reduction():
         '''
     mycursor.execute(sql, (id,))
     reduction = mycursor.fetchone()
-    # TODO : Afficher message flash ?
     return render_template('reduction/edit_reduction.html', reduction=reduction)
 
 
@@ -446,7 +436,6 @@ def valid_edit_reduction():
     mycursor.execute(sql, (valeur, id))
     get_db().commit()
 
-    # Afficher message flash ?
     return redirect('/reduction/show')
 
 

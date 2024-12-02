@@ -32,6 +32,7 @@
     </div>
 
     <script>
+        // settings, couleur, etc
         function setupBarChart(labels, data) {
             return new Chart(document.getElementById("barChart"), {
                 type: 'bar',
@@ -86,7 +87,7 @@
             });
         }
 
-        // Initialiser les graphiques avec les données Flask
+        // Init des graphs avec données Flask
         const barChart = setupBarChart({{ barChartLabels | tojson }}, {{ barChartData | tojson }});
         const pieChart = setupPieChart({{ pieChartLabels | tojson }}, {{ pieChartData | tojson }});
 
@@ -95,7 +96,7 @@
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => checkbox.value);
         }
-
+        // Filtre pour graph à barres/bâton
         async function filterBarChart() {
             const selectedCategories = getSelectedValues('category-checkbox');
             const selectedClientTypes = getSelectedValues('client-checkbox');
