@@ -8,43 +8,219 @@
         <h3>États clients</h3>
     </div>
     <div class="form-container d-block m-5">
-        <form method="post" action="/client/etat">
-            <h3>Type d'état :</h3>
-            <fieldset class="d-flex">
+        <h3>Type d'état :</h3>
+        <div class="d-flex">
 
-                <div class="w-25">
-                    <h5>Catégorie des clients :</h5>
-                    <div class="form-check">
-                        {% for cat in catClient %}
-                            <input class="form-check-input" type="checkbox" value="{{ cat.id }}"
-                                   name="catFilter"
-                                   id="category_{{ cat.id }}">
-                            <label class="form-check-label" for="category_{{ cat.id }}">{{ cat.nomCategorie }}</label>
-                            <br>
-                        {% endfor %}
+            <div class="w-25">
+                <h5>Catégorie des clients :</h5>
+                <div class="form-check">
+                    {% for cat in catClient %}
+                        <input class="form-check-input category-checkbox" type="checkbox" value="{{ cat.id }}"
+                               name="catFilter"
+                               id="category_{{ cat.id }}">
+                        <label class="form-check-label" for="category_{{ cat.id }}">{{ cat.nomCategorie }}</label>
+                        <br>
+                    {% endfor %}
+                </div>
+                <br>
+                <h5>Interval de prix total d'achat :</h5>
+                <div class="form-group row">
+                    <label for="filtreMin" class="col-form-label">Minimum (vide pour 0) :</label>
+                    <div class="col-7">
+                        <input type="number" value="" name="filtre_min" id="filtreMin" class="form-control">
                     </div>
                 </div>
-                <div class="w-25">
-                    <h5>Interval de prix total d'achat :</h5>
-                    <div class="form-group row">
-                        <label for="filtreMin" class="col-form-label">Minimum :</label>
-                        <div class="col-7">
-                            <input type="number" value="" name="filtre_min" id="filtreMin" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label for="filtreMax" class="col-form-label">Maximum :</label>
-                        <div class="col-7">
-                            <input type="number" value="" name="filtre_max" id="filtreMax" class="form-control">
-                        </div>
-
+                <div class="form-group row">
+                    <label for="filtreMax" class="col-form-label">Maximum (vide pour sans limites) :</label>
+                    <div class="col-7">
+                        <input type="number" value="" name="filtre_max" id="filtreMax" class="form-control">
                     </div>
 
-                    <br>
-                    <input type="submit" value="Valider" name="Valider" class="btn btn-primary">
-            </fieldset>
-        </form>
+                </div>
+
+                <br>
+                <button type="button" onclick="filterChart()" class="btn btn-primary">Valider</button>
+            </div>
+            <div class="w-75">
+                <div style="display: flex; justify-content: center; height: 500px; width: 100%">
+                    <canvas id="barChart" width="100%" height="100%"></canvas>
+                    <canvas id="pieChart" width="100%" height="100%"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
+
+
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Catégorie</th>
+            </tr>
+            </thead>
+            <tbody id="valuesClient">
+            {% if clients | length >= 1 %}
+                {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>{{ client.nomClient }}</td>
+                        <td>{{ client.prenomClient }}</td>
+                        <td>{{ client.nomCategorie }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>
+                        pas de client
+                    </td>
+                </tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+
+    <script>
+        function setupBarChart(labels, data) {
+            return new Chart(document.getElementById("barChart"), {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Total achats",
+                        backgroundColor: "rgba(75, 192, 192, 0.2)",
+                        borderColor: "rgba(75, 192, 192, 1)",
+                        borderWidth: 1,
+                        data: data
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Nombre d\'achats par catégorie client',
+                            font: {
+                                size: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function setupPieChart(labels, data) {
+            return new Chart(document.getElementById("pieChart"), {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                        borderColor: "#fff",
+                        borderWidth: 3,
+                        data: data
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Nombre de clients par catégorie client',
+                            font: {
+                                size: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialiser les graphiques avec les données Flask
+        const barChart = setupBarChart({{ barChartLabels | tojson }}, {{ barChartData | tojson }});
+        const pieChart = setupPieChart({{ pieChartLabels | tojson }}, {{ pieChartData | tojson }});
+
+        function getSelectedValues(className) {
+            return Array.from(document.getElementsByClassName(className))
+                .filter(checkbox => checkbox.checked)
+                .map(checkbox => checkbox.value);
+        }
+
+        function addData(chart, labels, datas) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = datas;
+            chart.update();
+        }
+
+        function removeData(chart) {
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.update();
+        }
+
+        function updateTable(data) {
+            const tableBody = document.getElementById('valuesClient');
+            tableBody.innerHTML = '';
+
+            if (data.length > 0) {
+                    const table = document.createElement('tr');
+                    table.innerHTML = `
+                        <td>{{ clients.id }}</td>
+                        <td>{{ clients.nomClient }}</td>
+                        <td>{{ clients.prenomClient }}</td>
+                        <td>{{ clients.nomCategorie }}</td>
+            `;
+                    tableBody.appendChild(table);
+            } else {
+                const table = document.createElement('tr');
+                table.innerHTML = '<td colspan="8">Pas de client pour ces paramètres</td>';
+                tableBody.appendChild(table);
+            }
+        }
+
+        async function filterChart() {
+            const selectedCategories = getSelectedValues('category-checkbox');
+
+            let minValue;
+            let maxValue;
+
+            if (document.getElementById('filtreMin').value === '') {
+                minValue = 0;
+            } else {
+                minValue = document.getElementById('filtreMin').value;
+            }
+
+            if (document.getElementById('filtreMax').value === '') {
+                maxValue = 10000;
+            } else {
+                maxValue = document.getElementById('filtreMax').value;
+            }
+
+            fetch('/client/etat/piechart?categories=' + selectedCategories.join(',') + '&min=' + minValue + '&max=' + maxValue)
+                .then(response => response.json())
+                .then(response => {
+                    const result = response;
+                    removeData(pieChart);
+                    addData(pieChart, result.labels, result.data)
+                });
+
+            fetch('/client/etat/barchart?categories=' + selectedCategories.join(',') + '&min=' + minValue + '&max=' + maxValue)
+                .then(response => response.json())
+                .then(response => {
+                    const result = response;
+                    removeData(barChart);
+                    addData(barChart, result.labels, result.data)
+                });
+
+            fetch('/client/etat/table?categories=' + selectedCategories.join(',') + '&min=' + minValue + '&max=' + maxValue)
+                .then(response => response.json())
+                .then(response => {
+                    updateTable(response)
+                });
+
+        }
+    </script>
 
 
 

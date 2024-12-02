@@ -16,11 +16,11 @@
                 <th>ID</th>
                 <th>Nom</th>
                 <th>Prénom</th>
+                <th>Catégorie</th>
                 <th>Téléphone</th>
                 <th>Adresse</th>
                 <th>E-mail</th>
                 <th>Age</th>
-                <th>Catégorie</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -31,11 +31,11 @@
                         <td>{{ client.id }}</td>
                         <td>{{ client.nomClient }}</td>
                         <td>{{ client.prenomClient }}</td>
+                        <td>{{ client.nomCategorie }}</td>
                         <td>{{ client.telClient }}</td>
                         <td>{{ client.adresseClient }}</td>
                         <td>{{ client.emailClient }}</td>
                         <td>{{ client.ageClient }}</td>
-                        <td>{{ client.nomCategorie }}</td>
                         <td>
                             <a href="/client/edit?id={{ client.id }}" class="btn btn-outline-secondary">Éditer</a>
                             <a href="/client/delete?id={{ client.id }}" class="btn btn-outline-danger">Supprimer</a>
