@@ -10,13 +10,6 @@
             const dateDebut = document.getElementById("start-date").value;
             const dateFin = document.getElementById("end-date").value;
 
-            {#fetch('/achat/etat/piechart?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
-            {#    .then(response => response.json())#}
-            {#    .then(response => {#}
-            {#        const result = response;#}
-            {#        removeData(pieChart);#}
-            {#        addData(pieChart, result.labels, result.data)#}
-            {#    });#}
             fetch('/achat/etat/barchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)
                 .then(response => response.json())
                 .then(response => {
@@ -24,18 +17,7 @@
                     removeData(barChart);
                     addData(barChart, result.labels, result.data)
                 });
-            {#fetch('/achat/etat/radarchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
-            {#    .then(response => response.json())#}
-            {#    .then(response => {#}
-            {#        const result = response;#}
-            {#        removeDataRadarChart(radarChart);#}
-            {#        addDataRadarChart(radarChart, result.labels, result.data);#}
-            {#    });#}
-            {#fetch('/achat/etat/total?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
-            {#    .then(response => response.json())#}
-            {#    .then(response => {#}
-            {#        document.getElementById("total-qty").innerHTML = response.total;#}
-            {#    });#}
+
         }
     </script>
     <div style="display: flex; align-items: center; gap: 10px; margin-right: 50px">
@@ -58,6 +40,17 @@
         {% endif %}
     </div>
     <script>
+            function addData(chart, labels, datas) {
+            chart.data.labels = labels;
+            chart.data.datasets[0].data = datas;
+            chart.update();
+        }
+
+        function removeData(chart) {
+            chart.data.labels = [];
+            chart.data.datasets[0].data = [];
+            chart.update();
+        }
         // Bar chart
         function setupBarChart(barChartLabels, barChartData) {
             return new Chart(document.getElementById("bar-chart"), {

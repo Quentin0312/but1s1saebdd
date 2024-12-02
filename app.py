@@ -1061,8 +1061,7 @@ def show_achat_etat():
         Achat.date_achat AS Date,
         SUM(Achat.prix_total) AS Total_achats
     FROM Achat
-    GROUP BY Achat.date_achat
-    ORDER BY Achat.date_achat;
+    GROUP BY Achat.date_achat;
     '''
     mycursor.execute(bar_chart_sql)
     barChartRaw = mycursor.fetchall()
@@ -1097,7 +1096,30 @@ def show_achat_etat():
     return render_template('/achat/etat_achat.html', barChartLabels=barChartLabels,
                            barChartData=barChartData, dateDebut=dateDebut,dateFin=dateFin,)
 
+@app.route('/achat/etat/barchart', methods=['GET'])
+def get_filtered_etat():
+    mycursor = get_db().cursor()
+    date_debut = request.args.get('date_debut', '')
+    date_fin = request.args.get('date_fin', '')
 
+    bar_chart_sql = '''
+    SELECT
+        Achat.date_achat AS Date,
+        SUM(Achat.prix_total) AS Total_achats
+    FROM Achat
+    WHERE date_achat BETWEEN %s AND %s
+    GROUP BY Achat.date_achat;
+    '''
+    mycursor.execute(bar_chart_sql, (date_debut, date_fin))
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['Date'] for elt in barChartRaw]
+    barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
+    barChartData = [elt['Total_achats'] for elt in barChartRaw]
+    barChartData = [str(elt) for elt in barChartData]
+    return jsonify({
+        "labels": barChartLabels,
+        "data": barChartData
+    })
 
 if __name__ == '__main__':
     app.run()
