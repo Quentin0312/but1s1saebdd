@@ -547,7 +547,7 @@ def show_reduction_etat():
     MAX(Reduction.valeur_reduction) AS maxReduction FROM Reduction
     JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
     JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
-    GROUP BY Type_vetement.libelle_type, Reduction.id_categorie
+    GROUP BY Type_vetement.libelle_type, Categorie_client.libelle_categorie
     ORDER BY Reduction.valeur_reduction DESC;
     '''
     mycursor.execute(stats)
@@ -558,7 +558,7 @@ def show_reduction_etat():
     SELECT Type_vetement.libelle_type AS typeVetement, AVG(Reduction.valeur_reduction) AS totalReduction
     FROM Reduction
     JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-    GROUP BY Reduction.id_type
+    GROUP BY Type_vetement.libelle_type
     ORDER BY totalReduction DESC;
     '''
     mycursor.execute(bar_chart_sql)
@@ -571,7 +571,7 @@ def show_reduction_etat():
     SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction, COUNT(Reduction.valeur_reduction) AS nbReduction
     FROM Reduction
     JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
-    GROUP BY Reduction.id_categorie
+    GROUP BY Categorie_client.libelle_categorie
     ORDER BY totalReduction DESC;
     '''
     mycursor.execute(pie_chart_sql)
@@ -615,7 +615,7 @@ def reduction_get_barchart_filtered_data():
         JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
         JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
         WHERE Reduction.id_categorie IN ({placeholders_categories})
-        GROUP BY Reduction.id_type
+        GROUP BY Type_vetement.libelle_type
         ORDER BY totalReduction DESC;
         '''
         mycursor.execute(sql, categorie_ids)
@@ -626,7 +626,7 @@ def reduction_get_barchart_filtered_data():
         FROM Reduction
         JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
         WHERE Reduction.id_categorie IN ({placeholders_categories})
-        GROUP BY Reduction.id_type
+        GROUP BY Type_vetement.libelle_type
         ORDER BY totalReduction DESC;
         '''
         mycursor.execute(sql, categorie_ids)
@@ -636,7 +636,7 @@ def reduction_get_barchart_filtered_data():
         SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
         FROM Reduction
         JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-        GROUP BY Reduction.id_type
+        GROUP BY Type_vetement.libelle_type
         ORDER BY totalReduction DESC;
         '''
         mycursor.execute(sql)
