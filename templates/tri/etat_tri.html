@@ -11,16 +11,19 @@
             chart.data.datasets[0].data = [];
             chart.update();
         }
+
         function removeDataRadarChart(chart) {
             chart.data.labels = [];
             chart.data.datasets = [];
             chart.update();
         }
+
         function addData(chart, labels, datas) {
             chart.data.labels = labels;
             chart.data.datasets[0].data = datas;
             chart.update();
         }
+
         function addDataRadarChart(chart, labels, datas) {
             chart.data.labels = labels;
             let datasets = [];
@@ -76,7 +79,10 @@
     <div style="display: flex; justify-content: space-between">
         <div class="show-head-content">
             <h3>État de Tri</h3>
-            <span>Quantité totale : </span><b id="total-qty" style="color: blue">{{ total_qty | safe }}</b><span style="color: blue"> kg</span>
+            {% if total_qty != "None" %}
+                <span>Quantité totale : </span><b id="total-qty" style="color: blue">{{ total_qty | safe }}</b><span
+                    style="color: blue"> kg</span>
+            {% endif %}
         </div>
         <div style="display: flex; align-items: center; gap: 10px; margin-right: 50px">
             <label for="start-date">Date de début:</label>
@@ -90,9 +96,13 @@
         </div>
     </div>
     <div style="display: flex;justify-content: space-evenly;height: 500px; width: 100%; margin-top: 50px">
-        <canvas id="bar-chart" width="100%" height="100%"></canvas>
-        <canvas id="pie-chart" width="100%" height="100%"></canvas>
-        <canvas id="radar-chart" width="800" height="600"></canvas>
+        {% if barChartData|length == 0 %}
+            <h1>Pas de données</h1>
+        {% else %}
+            <canvas id="bar-chart" width="100%" height="100%"></canvas>
+            <canvas id="pie-chart" width="100%" height="100%"></canvas>
+            <canvas id="radar-chart" width="800" height="600"></canvas>
+        {% endif %}
     </div>
     <script>
         // Bar chart
