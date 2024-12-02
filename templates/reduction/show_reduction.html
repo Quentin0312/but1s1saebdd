@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>afficher les réductions</title>
+    <title>afficher les réductions</title>
 {% endblock %}
 
 {% block body %}
-<div class="show-head-content">
-    <h3>Réductions</h3>
-    <a class="btn btn-primary" href="/reduction/add">Ajouter une réduction</a>
-</div>
-<div class="table-container">
-    <table class="table">
-        <thead class="thead-dark">
+    <div class="show-head-content">
+        <h3>Réductions</h3>
+        <a class="btn btn-primary" href="/reduction/add">Ajouter une réduction</a>
+    </div>
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-dark">
             <tr>
                 <th>Valeur</th>
                 <th>Catégorie client</th>
@@ -21,30 +21,44 @@
                 <th>Actions</th>
 
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% if reduction | length >= 1 %}
-            {% for ligne in reduction %}
-            <tr>
-                <td>{{ ligne.valeur }}</td>
-                <td>{{ ligne.categorie }}</td>
-                <td>{{ ligne.type }}</td>
-                <td>{{ '%0.2f' | format(ligne.prixAuKgReduc|float) }} €</td>
-                <td>{{ ligne.prixAuKgSansReduc }} €</td>
-                <td>
-                    <a href="/reduction/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
-                    <a href="/reduction/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for ligne in reduction %}
+                    <tr>
+                        <td>{{ ligne.valeur }}</td>
+                        <td>{{ ligne.categorie }}</td>
+                        <td><span>{{ ligne.nomType }}</span>
+                            {% if ligne.idType == 1 %}
+                                <span class="badge rounded-pill bg-primary">{{ ligne.idType }}</span>
+                            {% elif ligne.idType == 2 %}
+                                <span class="badge rounded-pill bg-dark">{{ ligne.idType }}</span>
+                            {% elif ligne.idType == 3 %}
+                                <span class="badge rounded-pill bg-success">{{ ligne.idType }}</span>
+                            {% elif ligne.idType == 4 %}
+                                <span class="badge rounded-pill bg-danger">{{ ligne.idType }}</span>
+                            {% elif ligne.idType == 5 %}
+                                <span class="badge rounded-pill bg-warning text-dark">{{ ligne.idType }}</span>
+                            {% elif ligne.idType == 6 %}
+                                <span class="badge rounded-pill bg-info text-dark">{{ ligne.idType }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ '%0.2f' | format(ligne.prixAuKgReduc|float) }} €</td>
+                        <td>{{ ligne.prixAuKgSansReduc }} €</td>
+                        <td>
+                            <a href="/reduction/edit?id={{ ligne.id }}" class="btn btn-outline-secondary">Éditer</a>
+                            <a href="/reduction/delete?id={{ ligne.id }}" class="btn btn-outline-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
             {% else %}
-            <tr>
-                <td>
-                    pas de réduction
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        pas de réduction
+                    </td>
+                </tr>
             {% endif %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

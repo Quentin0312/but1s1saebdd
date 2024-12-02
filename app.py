@@ -63,7 +63,8 @@ def show_reduction():
     sql = '''
     SELECT Reduction.id_reduction AS id,
            Reduction.valeur_reduction AS valeur,
-           Tv.libelle_type AS type,
+           Tv.libelle_type AS nomType,
+           Tv.id_type AS idType,
            Cc.libelle_categorie AS categorie,
            (Tv.prix_kg_type - Tv.prix_kg_type * (Reduction.valeur_reduction/100)) AS prixAuKgReduc,
            Tv.prix_kg_type AS prixAuKgSansReduc
