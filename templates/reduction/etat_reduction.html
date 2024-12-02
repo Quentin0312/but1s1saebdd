@@ -11,9 +11,9 @@
 {% block body %}
     <div class="show-head-content">
         <h3>État des Réductions</h3>
-        <div style="display: flex; width: px; padding: 10px" class="card form-group mr-3">
+        <div style="display: flex; padding: 10px 10px 0px 10px" class="card form-group mr-3">
             <p>La plus grande réduction est : <strong>{{ stats.maxReduction }}</strong>%, pour le type de vêtement :
-                <strong>{{ stats.nomTypeVetement }}</strong>, pour la catégorie :
+                <strong>{{ stats.nomTypeVetement }}</strong>, pour la catégorie client :
                 <strong>{{ stats.nomCategorie }}</strong></p>
         </div>
     </div>
@@ -32,7 +32,6 @@
                         </div>
                     {% endfor %}
                 </div>
-
                 <button type="button" onclick="filterBarChart()" class="btn btn-primary">Valider</button>
             </div>
         </div>
@@ -44,7 +43,7 @@
     <div style="display: flex; float: right; height: 500px; width: 30%; margin: 20px 100px">
         <canvas id="pieChart" width="100%" height="100%"></canvas>
 
-        <button type="button" style="position: absolute; top: 86.5%; width:500px" class="btn btn-outline-primary" id="toggleChart">Sans nombre de réduction</button>
+        <button type="button" style="position: absolute; top: 85%; width:500px" class="btn btn-outline-primary" id="toggleChart">Sans nombre de réduction</button>
     </div>
 
 
