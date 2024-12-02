@@ -657,8 +657,7 @@ def show_client_etat():
             RIGHT JOIN Achat ON Client.id_client = Achat.id_client
             RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
             WHERE Client.id_client IS NOT NULL
-            GROUP BY Categorie_client.id_categorie
-            ORDER BY Categorie_client.id_categorie;
+            GROUP BY Categorie_client.libelle_categorie;
             '''
     mycursor.execute(bar_chart_sql)
     barChartRaw = mycursor.fetchall()
@@ -671,7 +670,7 @@ def show_client_etat():
             FROM Client
             RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
             WHERE Client.id_client IS NOT NULL
-            GROUP BY Categorie_client.id_categorie;
+            GROUP BY Categorie_client.libelle_categorie;
             '''
     mycursor.execute(pie_chart_sql)
     pieChartRaw = mycursor.fetchall()
