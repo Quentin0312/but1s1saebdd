@@ -228,13 +228,13 @@ def add_client():
 
 @app.route('/client/add', methods=['POST'])
 def valid_add_client():
-    nomClient = request.form.get('nomClient')
-    prenomClient = request.form.get('prenomClient')
-    telClient = request.form.get('telClient')
-    adresseClient = request.form.get('adresseClient')
-    emailClient = request.form.get('emailClient')
-    dateClient = request.form.get('dateClient')
-    idCategorie = request.form.get('idCategorie')
+    nomClient = request.form.get('nomClient', '')
+    prenomClient = request.form.get('prenomClient', '')
+    telClient = request.form.get('telClient', '')
+    adresseClient = request.form.get('adresseClient', '')
+    emailClient = request.form.get('emailClient', '')
+    dateClient = request.form.get('dateClient', '')
+    idCategorie = request.form.get('idCategorie', '')
 
     mycursor = get_db().cursor()
     sql = ''' INSERT INTO Client (id_client, nom_client, prenom_client, tel_client, adresse_client, email_client,
@@ -334,7 +334,7 @@ def delete_reduction():
 
 @app.route('/client/delete', methods=['GET'])
 def delete_client():
-    id = request.args.get('id')
+    id = request.args.get('id', '')
     mycursor = get_db().cursor()
 
     sql = "SELECT id_achat AS id, date_achat AS dateAchat, prix_total AS prixAchat, id_client AS idClient FROM Achat WHERE id_client = %s;"
@@ -354,8 +354,8 @@ def delete_client():
 
 @app.route('/client/fulldelete', methods=['GET'])
 def fulldelete_client():
-    id = request.args.get('id')
-    idClient = request.args.get('idClient')
+    id = request.args.get('id', '')
+    idClient = request.args.get('idClient', '')
     mycursor = get_db().cursor()
 
     sql = "SELECT id_type, id_achat FROM Concerne WHERE id_achat = %s;"
@@ -444,7 +444,7 @@ def valid_edit_reduction():
 
 @app.route('/client/edit', methods=['GET'])
 def edit_client():
-    id = request.args.get('id')
+    id = request.args.get('id', '')
     mycursor = get_db().cursor()
     sql = '''
         SELECT Client.id_client AS id,
@@ -474,14 +474,14 @@ def edit_client():
 
 @app.route('/client/edit', methods=['POST'])
 def valid_edit_client():
-    id = request.form.get('id')
-    nomClient = request.form.get('nomClient')
-    prenomClient = request.form.get('prenomClient')
-    telClient = request.form.get('telClient')
-    adresseClient = request.form.get('adresseClient')
-    emailClient = request.form.get('emailClient')
-    dateClient = request.form.get('dateClient')
-    idCategorie = request.form.get('idCategorie')
+    id = request.form.get('id', '')
+    nomClient = request.form.get('nomClient', '')
+    prenomClient = request.form.get('prenomClient', '')
+    telClient = request.form.get('telClient', '')
+    adresseClient = request.form.get('adresseClient', '')
+    emailClient = request.form.get('emailClient', '')
+    dateClient = request.form.get('dateClient', '')
+    idCategorie = request.form.get('idCategorie', '')
 
     mycursor = get_db().cursor()
     sql = ''' UPDATE Client SET nom_client=%s, prenom_client=%s, tel_client=%s, adresse_client=%s, email_client=%s,
@@ -538,18 +538,19 @@ def valid_edit_tri():
 def edit_achat():
     return render_template('achat/edit_achat.html')
 
+
 @app.route('/reduction/etat', methods=['GET'])
 def show_reduction_etat():
     mycursor = get_db().cursor()
 
     # Charger les données pour le graphique à barres
     bar_chart_sql = '''
-    SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
-    FROM Reduction
-    JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-    GROUP BY Reduction.id_type
-    ORDER BY totalReduction DESC;
-    '''
+        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+        GROUP BY Reduction.id_type
+        ORDER BY totalReduction DESC;
+        '''
     mycursor.execute(bar_chart_sql)
     barChartRaw = mycursor.fetchall()
     barChartLabels = [elt['typeVetement'] for elt in barChartRaw]
@@ -557,12 +558,12 @@ def show_reduction_etat():
 
     # Charger les données pour le graphique en camembert
     pie_chart_sql = '''
-    SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction
-    FROM Reduction
-    JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
-    GROUP BY Reduction.id_categorie
-    ORDER BY totalReduction DESC;
-    '''
+        SELECT Categorie_client.libelle_categorie AS categorie, SUM(Reduction.valeur_reduction) AS totalReduction
+        FROM Reduction
+        JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+        GROUP BY Reduction.id_categorie
+        ORDER BY totalReduction DESC;
+        '''
     mycursor.execute(pie_chart_sql)
     pieChartRaw = mycursor.fetchall()
     pieChartLabels = [elt['categorie'] for elt in pieChartRaw]
@@ -582,6 +583,7 @@ def show_reduction_etat():
         categories=categories
     )
 
+
 @app.route('/reduction/etat/barchart', methods=['GET'])
 def reduction_get_barchart_filtered_data():
     categories = request.args.get('categories')  # Catégories sélectionnées sous forme de chaîne CSV
@@ -598,50 +600,50 @@ def reduction_get_barchart_filtered_data():
         placeholders_categories = ','.join(['%s'] * len(category_ids))
         placeholders_client_types = ','.join(['%s'] * len(client_type_ids))
         sql = f'''
-        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
-        FROM Reduction
-        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-        JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
-        WHERE Reduction.id_categorie IN ({placeholders_categories})
-        AND Categorie_client.id_categorie IN ({placeholders_client_types})
-        GROUP BY Reduction.id_type
-        ORDER BY totalReduction DESC;
-        '''
+            SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+            FROM Reduction
+            JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+            JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+            WHERE Reduction.id_categorie IN ({placeholders_categories})
+            AND Categorie_client.id_categorie IN ({placeholders_client_types})
+            GROUP BY Reduction.id_type
+            ORDER BY totalReduction DESC;
+            '''
         mycursor.execute(sql, category_ids + client_type_ids)
     elif category_ids:
         # Si seulement les catégories sont sélectionnées
         placeholders_categories = ','.join(['%s'] * len(category_ids))
         sql = f'''
-        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
-        FROM Reduction
-        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-        WHERE Reduction.id_categorie IN ({placeholders_categories})
-        GROUP BY Reduction.id_type
-        ORDER BY totalReduction DESC;
-        '''
+            SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+            FROM Reduction
+            JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+            WHERE Reduction.id_categorie IN ({placeholders_categories})
+            GROUP BY Reduction.id_type
+            ORDER BY totalReduction DESC;
+            '''
         mycursor.execute(sql, category_ids)
     elif client_type_ids:
         # Si seulement les types de clients sont sélectionnés
         placeholders_client_types = ','.join(['%s'] * len(client_type_ids))
         sql = f'''
-        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
-        FROM Reduction
-        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-        JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
-        WHERE Categorie_client.id_categorie IN ({placeholders_client_types})
-        GROUP BY Reduction.id_type
-        ORDER BY totalReduction DESC;
-        '''
+            SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+            FROM Reduction
+            JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+            JOIN Categorie_client ON Reduction.id_categorie = Categorie_client.id_categorie
+            WHERE Categorie_client.id_categorie IN ({placeholders_client_types})
+            GROUP BY Reduction.id_type
+            ORDER BY totalReduction DESC;
+            '''
         mycursor.execute(sql, client_type_ids)
     else:
         # Aucune catégorie ou type de client sélectionné : récupérer toutes les données
         sql = '''
-        SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
-        FROM Reduction
-        JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
-        GROUP BY Reduction.id_type
-        ORDER BY totalReduction DESC;
-        '''
+            SELECT Type_vetement.libelle_type AS typeVetement, SUM(Reduction.valeur_reduction) AS totalReduction
+            FROM Reduction
+            JOIN Type_vetement ON Reduction.id_type = Type_vetement.id_type
+            GROUP BY Reduction.id_type
+            ORDER BY totalReduction DESC;
+            '''
         mycursor.execute(sql)
 
     result = mycursor.fetchall()
@@ -650,9 +652,19 @@ def reduction_get_barchart_filtered_data():
 
     return jsonify({'labels': labels, 'data': data})
 
+
 @app.route('/client/etat', methods=['GET'])
 def show_client_etat():
-    return render_template('/client/etat_client.html')
+    mycursor = get_db().cursor()
+    sql = '''
+                SELECT Categorie_client.id_categorie AS id, 
+                    Categorie_client.libelle_categorie AS nomCategorie
+                FROM Categorie_client;
+                '''
+    mycursor.execute(sql)
+    catClient = mycursor.fetchall()
+
+    return render_template('/client/etat_client.html', catClient=catClient)
 
 
 @app.route('/tri/etat', methods=['GET'])
@@ -717,14 +729,6 @@ def show_tri_etat():
         radarChartData[elt_date_ramassage][elt['id_type'] - 1] = float(
             elt['poids_type_trie'])
 
-    # Total quantity
-    total_qty_sql = '''
-    SELECT SUM(poids_type_trie) AS total
-    FROM Tri;
-    '''
-    mycursor.execute(total_qty_sql)
-    total_qty_raw = mycursor.fetchone()
-    total_qty = str(total_qty_raw['total'])
     # Filter
     date_debut_pie_chart_sql = '''
     SELECT Ramassage.date_ramassage
@@ -750,8 +754,7 @@ def show_tri_etat():
 
     return render_template('/tri/etat_tri.html', barChartLabels=barChartLabels, barChartData=barChartData,
                            pieChartLabels=pieChartLabels, pieChartData=pieChartData, dateDebut=dateDebut,
-                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData,
-                           total_qty=total_qty)
+                           dateFin=dateFin, radarChartLabels=radarChartLabels, radarChartData=radarChartData)
 
 
 @app.route('/tri/etat/piechart', methods=['GET'])
@@ -853,27 +856,6 @@ def get_radarchart_filtered_data():
     })
 
     return result
-
-
-@app.route('/tri/etat/total', methods=['GET'])
-def get_total_filtered_data():
-    date_debut = request.args.get('date_debut', '')
-    date_fin = request.args.get('date_fin', '')
-
-    mycursor = get_db().cursor()
-    sql = '''
-    SELECT SUM(poids_type_trie) AS total
-    FROM Tri
-             JOIN Ramassage ON Ramassage.id_ramassage = Tri.id_ramassage
-    WHERE date_ramassage BETWEEN %s AND %s;
-    '''
-    mycursor.execute(sql, (date_debut, date_fin))
-    rawResponse = mycursor.fetchone()
-    total = rawResponse['total']
-
-    return jsonify({
-        "total": total
-    })
 
 
 @app.route('/achat/etat', methods=['GET'])

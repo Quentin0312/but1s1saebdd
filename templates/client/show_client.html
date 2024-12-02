@@ -1,17 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block title %}
-<title>Afficher les clients</title>
+    <title>Afficher les clients</title>
 {% endblock %}
 
 {% block body %}
-<div class="show-head-content">
-    <h3>Clients</h3>
-    <a class="btn btn-primary" href="/client/add">Ajouter un client</a>
-</div>
-<div class="table-container">
-    <table class="table">
-        <thead class="thead-dark">
+    <div class="show-head-content">
+        <h3>Clients</h3>
+        <a class="btn btn-primary" href="/client/add">Ajouter un client</a>
+    </div>
+    <div class="table-container">
+        <table class="table">
+            <thead class="thead-dark">
             <tr>
                 <th>ID</th>
                 <th>Nom</th>
@@ -23,33 +23,33 @@
                 <th>Catégorie</th>
                 <th>Actions</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% if clients | length >= 1 %}
-            {% for client in clients %}
-            <tr>
-                <td>{{ client.id }}</td>
-                <td>{{ client.nomClient }}</td>
-                <td>{{ client.prenomClient }}</td>
-                <td>{{ client.telClient }}</td>
-                <td>{{ client.adresseClient }}</td>
-                <td>{{ client.emailClient }}</td>
-                <td>{{ client.ageClient }}</td>
-                <td>{{ client.nomCategorie }}</td>
-                <td>
-                    <a href="/client/edit?id={{ client.id }}" class="btn btn-outline-secondary">Éditer</a>
-                    <a href="/client/delete?id={{ client.id }}" class="btn btn-outline-danger">Supprimer</a>
-                </td>
-            </tr>
-            {% endfor %}
+                {% for client in clients %}
+                    <tr>
+                        <td>{{ client.id }}</td>
+                        <td>{{ client.nomClient }}</td>
+                        <td>{{ client.prenomClient }}</td>
+                        <td>{{ client.telClient }}</td>
+                        <td>{{ client.adresseClient }}</td>
+                        <td>{{ client.emailClient }}</td>
+                        <td>{{ client.ageClient }}</td>
+                        <td>{{ client.nomCategorie }}</td>
+                        <td>
+                            <a href="/client/edit?id={{ client.id }}" class="btn btn-outline-secondary">Éditer</a>
+                            <a href="/client/delete?id={{ client.id }}" class="btn btn-outline-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                {% endfor %}
             {% else %}
-            <tr>
-                <td>
-                    pas de client
-                </td>
-            </tr>
+                <tr>
+                    <td>
+                        pas de client
+                    </td>
+                </tr>
             {% endif %}
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

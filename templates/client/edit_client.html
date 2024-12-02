@@ -11,7 +11,7 @@
     <div class="form-container">
         <form method="post" action="/client/edit">
             <fieldset>
-                <legend>Modifications : </legend>
+                <legend>Modifications :</legend>
                 <input type="hidden" name="id" value="{{ client.id }}">
                 <div class="mb-3">
                     <label for="nomClient" class="form-label">Nom</label><br>
@@ -49,7 +49,8 @@
                     <select name="idCategorie" id="idCategorie" class="form-select" required>
                         <option value="">Sélectionner une catégorie</option>
                         {% for cat in catClient %}
-                            <option value="{{ cat.id }}" {% if client.idCategorie is defined and client.idCategorie == cat.id %}selected{% endif %}>{{ cat.nomCategorie }}</option>
+                            <option value="{{ cat.id }}"
+                                    {% if client.idCategorie is defined and client.idCategorie == cat.id %}selected{% endif %}>{{ cat.nomCategorie }}</option>
                         {% endfor %}
                     </select>
                 </div>
