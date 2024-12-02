@@ -710,8 +710,7 @@ def client_get_barchart_filtered_data():
                 WHERE Client.id_categorie IN ({placeholders_categories})
                 AND Achat.prix_total BETWEEN %s AND %s
                 AND Client.id_client IS NOT NULL
-                GROUP BY Categorie_client.id_categorie
-                ORDER BY Categorie_client.id_categorie;
+                GROUP BY Categorie_client.libelle_categorie;
                 '''
         tuple_sql = (*category_ids, minPrice, maxPrice)
         mycursor.execute(sql, tuple_sql)
@@ -723,8 +722,7 @@ def client_get_barchart_filtered_data():
                 RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
                 WHERE Achat.prix_total BETWEEN %s AND %s
                 AND Client.id_client IS NOT NULL
-                GROUP BY Categorie_client.id_categorie
-                ORDER BY Categorie_client.id_categorie;
+                GROUP BY Categorie_client.libelle_categorie;
                 '''
         tuple_sql = (minPrice, maxPrice)
         mycursor.execute(sql, tuple_sql)
@@ -758,7 +756,7 @@ def client_get_piechart_filtered_data():
             WHERE Categorie_client.id_categorie IN ({placeholders_categories})
             AND Achat.prix_total BETWEEN %s AND %s
             AND Client.id_client IS NOT NULL
-            GROUP BY Categorie_client.id_categorie;
+            GROUP BY Categorie_client.libelle_categorie;
                     '''
         tuple_sql = (*category_ids, minPrice, maxPrice)
         mycursor.execute(sql, tuple_sql)
@@ -770,7 +768,7 @@ def client_get_piechart_filtered_data():
             RIGHT JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
             WHERE Achat.prix_total BETWEEN %s AND %s
             AND Client.id_client IS NOT NULL
-            GROUP BY Categorie_client.id_categorie;
+            GROUP BY Categorie_client.libelle_categorie;
                     '''
         tuple_sql = (minPrice, maxPrice)
         mycursor.execute(sql, tuple_sql)
@@ -802,7 +800,6 @@ def get_table_filtered_data():
             JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
             WHERE Client.id_categorie IN ({placeholders_categories})
             AND Achat.prix_total BETWEEN %s AND %s
-            GROUP BY Client.id_client
             ORDER BY Client.id_client;
         '''
         tuple_sql = (*category_ids, minPrice, maxPrice)
@@ -814,7 +811,6 @@ def get_table_filtered_data():
             JOIN Achat ON Client.id_client = Achat.id_client
             JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
             WHERE Achat.prix_total BETWEEN %s AND %s
-            GROUP BY Client.id_client
             ORDER BY Client.id_client;
         '''
         tuple_sql = (minPrice, maxPrice)
