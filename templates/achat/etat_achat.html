@@ -5,6 +5,111 @@
 {% endblock %}
 
 {% block body %}
+    <script>
+        async function filterPieChart() {
+            const dateDebut = document.getElementById("start-date").value;
+            const dateFin = document.getElementById("end-date").value;
 
+            {#fetch('/achat/etat/piechart?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
+            {#    .then(response => response.json())#}
+            {#    .then(response => {#}
+            {#        const result = response;#}
+            {#        removeData(pieChart);#}
+            {#        addData(pieChart, result.labels, result.data)#}
+            {#    });#}
+            fetch('/achat/etat/barchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)
+                .then(response => response.json())
+                .then(response => {
+                    const result = response;
+                    removeData(barChart);
+                    addData(barChart, result.labels, result.data)
+                });
+            {#fetch('/achat/etat/radarchart?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
+            {#    .then(response => response.json())#}
+            {#    .then(response => {#}
+            {#        const result = response;#}
+            {#        removeDataRadarChart(radarChart);#}
+            {#        addDataRadarChart(radarChart, result.labels, result.data);#}
+            {#    });#}
+            {#fetch('/achat/etat/total?date_debut=' + dateDebut + '&date_fin=' + dateFin)#}
+            {#    .then(response => response.json())#}
+            {#    .then(response => {#}
+            {#        document.getElementById("total-qty").innerHTML = response.total;#}
+            {#    });#}
+        }
+    </script>
+    <div style="display: flex; align-items: center; gap: 10px; margin-right: 50px">
+            <label for="start-date">Date de début:</label>
+            <input type="date" id="start-date" name="trip-start" value="{{ dateDebut | safe }}"
+                   min="{{ dateDebut | safe }}"
+                   max="{{ dateFin | safe }}"/>
+            <label for="end-date">Date de fin:</label>
+            <input type="date" id="end-date" name="trip-start" value="{{ dateFin | safe }}" min="{{ dateDebut | safe }}"
+                   max="{{ dateFin | safe }}"/>
+            <button type="button" onclick="filterPieChart()" class="btn btn-primary">Valider</button>
+    </div>
+    <div style="display: flex;justify-content: space-evenly;height: 500px; width: 100%; margin-top: 50px">
+        {% if barChartData|length == 0 %}
+            <h1>Pas de données</h1>
+        {% else %}
+            <canvas id="bar-chart" width="100%" height="100%"></canvas>
+            <canvas id="pie-chart" width="100%" height="100%"></canvas>
+            <canvas id="radar-chart" width="800" height="600"></canvas>
+        {% endif %}
+    </div>
+    <script>
+        // Bar chart
+        function setupBarChart(barChartLabels, barChartData) {
+            return new Chart(document.getElementById("bar-chart"), {
+                type: 'bar',
+                data: {
+                    labels: barChartLabels,
+                    datasets: [
+                        {
+                            label: "Prix total acheté (en €)",
+                            backgroundColor: ["#3e95cd"],
+                            data: barChartData
+                        }
+                    ]
+                },
+                options: {
+                    legend: {display: false},
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date de l\'achat '
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Prix total acheté (en €)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Prix total acheté par jour',
+                            font: {
+                                size: 20
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'bottom',
+                            formatter: Math.round,
+                            font: {
+                                size: 14
+                            },
+                            color: '#fff'
+                        },
+                    }
+                }, plugins: [ChartDataLabels]
+            });
+        }
+        const barChart = setupBarChart({{ barChartLabels | safe }}, {{ barChartData | safe }});
+    </script>
 
 {% endblock %}

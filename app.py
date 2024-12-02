@@ -1051,11 +1051,51 @@ def get_total_filtered_data():
     return jsonify({
         "total": total
     })
-
-
 @app.route('/achat/etat', methods=['GET'])
 def show_achat_etat():
-    return render_template('/achat/etat_achat.html')
+    # Bar chart
+    mycursor = get_db().cursor()
+    bar_chart_sql = '''
+    SELECT
+        Achat.date_achat AS Date,
+        SUM(Achat.prix_total) AS Total_achats
+    FROM Achat
+    GROUP BY Achat.date_achat
+    ORDER BY Achat.date_achat;
+    '''
+    mycursor.execute(bar_chart_sql)
+    barChartRaw = mycursor.fetchall()
+    barChartLabels = [elt['Date'] for elt in barChartRaw]
+    barChartLabels = [elt.strftime("%Y-%m-%d") for elt in barChartLabels]
+    barChartData = [elt['Total_achats'] for elt in barChartRaw]
+    barChartData = [str(elt) for elt in barChartData]
+
+    # Filter
+    date_debut_pie_chart_sql = '''
+    SELECT Achat.date_achat
+    FROM Achat
+    ORDER BY date_achat
+    LIMIT 1;
+    '''
+
+    date_fin_pie_chart_sql = '''
+    SELECT Achat.date_achat
+    FROM Achat
+    ORDER BY date_achat DESC
+    LIMIT 1;
+    '''
+
+    mycursor.execute(date_debut_pie_chart_sql)
+    dateDebutResponse = mycursor.fetchone()
+    dateDebut = dateDebutResponse['date_achat'].strftime("%Y-%m-%d")
+
+    mycursor.execute(date_fin_pie_chart_sql)
+    dateFinResponse = mycursor.fetchone()
+    dateFin = dateFinResponse['date_achat'].strftime("%Y-%m-%d")
+
+    return render_template('/achat/etat_achat.html', barChartLabels=barChartLabels,
+                           barChartData=barChartData, dateDebut=dateDebut,dateFin=dateFin,)
+
 
 
 if __name__ == '__main__':
