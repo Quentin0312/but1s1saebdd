@@ -394,6 +394,15 @@ def delete_tri():
 
 @app.route('/achat/delete', methods=['GET'])
 def delete_achat():
+    id = request.args.get('id', '')
+    mycursor = get_db().cursor()
+
+    sql_concerne = "DELETE FROM Concerne WHERE id_achat = %s;"
+    mycursor.execute(sql_concerne, (id,))
+
+    sql_achat = "DELETE FROM Achat WHERE id_achat = %s;"
+    mycursor.execute(sql_achat, (id,))
+    get_db().commit()
     return redirect('/achat/show')
 
 
