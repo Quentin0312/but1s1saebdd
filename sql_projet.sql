@@ -260,33 +260,3 @@ SET prix_total = (SELECT SUM(Type_vetement.prix_kg_type * Concerne.poids_type_ve
                            JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
                   WHERE Concerne.id_achat = Achat.id_achat)
 WHERE Achat.prix_total IS NULL;
-
-
-# -- Liste des clients ayant acheté des pantalons durant le mois d'octobre 2024
-# SELECT sous_requete.id_client, Client.nom_client AS Nom, Client.prenom_client AS Prenom
-# FROM (SELECT Achat.id_client AS id_client
-#       FROM Concerne
-#                JOIN Achat ON Concerne.id_achat = Achat.id_achat
-#       WHERE Concerne.id_type = 2
-#         AND MONTH(Achat.date_achat) = 10
-#         AND YEAR(Achat.date_achat) = 2024
-#       GROUP BY Achat.id_client) AS sous_requete
-#          JOIN Client ON sous_requete.id_client = Client.id_client;
-#
-# # -- Afficher le poids trié selon les types de vetements
-# # SELECT Type_vetement.libelle_type, sous_requete.poids_total
-# # FROM (SELECT Tri.id_type AS id_type, SUM(Tri.poids_type_trie) AS poids_total
-# #       FROM Tri
-# #       GROUP BY Tri.id_type) AS sous_requete
-# #          JOIN Type_vetement ON sous_requete.id_type = Type_vetement.id_type
-# # ORDER BY sous_requete.poids_total DESC;
-# #
-# # -- Total des ventes (en kg) par type de vêtement pour la période du '2024-10-01' au '2024-10-31'
-# # SELECT Type_vetement.libelle_type,
-# #        SUM(Concerne.poids_type_vetement) AS poids_total_kg_vendu
-# # FROM Achat
-# #          JOIN Concerne ON Achat.id_achat = Concerne.id_achat
-# #          JOIN Type_vetement ON Concerne.id_type = Type_vetement.id_type
-# # WHERE Achat.date_achat BETWEEN '2024-10-01' AND '2024-10-31'
-# # GROUP BY Type_vetement.id_type, Type_vetement.libelle_type
-# # ORDER BY poids_total_kg_vendu DESC;
