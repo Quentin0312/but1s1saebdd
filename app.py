@@ -645,7 +645,6 @@ def show_client_etat():
                             Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
                     FROM Client
                     JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
-                    GROUP BY Client.id_client
                     ORDER BY Client.id_client;
                     '''
     mycursor.execute(client_sql)
