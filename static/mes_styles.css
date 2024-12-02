@@ -16,3 +16,7 @@
 .alert-container {
   margin: 10px 50px;
 }
+
+.badge {
+  scale: 0.8;
+}
