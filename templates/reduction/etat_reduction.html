@@ -9,26 +9,24 @@
         <h3>État des Réductions</h3>
     </div>
 
-    <div class="show-head-content form-group mr-3">
-        <h2>Selection </h2>
-        <div class="form-group mr-3">
-            <label for="filter_items">Sélectionner des catégories :</label>
-            {% for category in categories %}
-                <div class="form-check">
-                    <input type="checkbox" name="filter_items" value="{{ category.id }}"
-                           class="form-check-input category-checkbox">
-                    <label class="form-check-label chckbx">{{ category.libelle }}</label>
-                </div>
-            {% endfor %}
+    <div style="position:absolute;display: flex; justify-content: space-between">
+        <div class="card show-head-content form-group mr-3" style="width: 300px;">
+            <div class="form-group mr-3 card-body">
+                <h3 for="filter_items" class="card-title">Sélectionner des catégories :</h3>
+                {% for category in categories %}
+                    <div class="form-check">
+                        <input type="checkbox" name="filter_items" value="{{ category.id }}"
+                               class="form-check-input category-checkbox">
+                        <label class="form-check-label chckbx">{{ category.libelle }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <button type="button" onclick="filterBarChart()" class="btn btn-primary">Valider</button>
         </div>
-
-        <button type="button" onclick="filterBarChart()" class="btn btn-primary">Valider</button>
     </div>
 
-
-    <div style="display: flex; justify-content: space-around">
-    </div>
-    <div style="display: flex; justify-content: center; height: 500px; width: 100%">
+    <div style="display: flex;justify-content: space-evenly;height: 500px; width: 100%; margin-top: 50px; margin-left: 150px">
         <canvas id="barChart" width="100%" height="100%"></canvas>
         <canvas id="pieChart" width="100%" height="100%"></canvas>
     </div>
@@ -67,7 +65,8 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        backgroundColor: ["#3e95cd", "#8e5ea2", "#3cba9f", "#e8c3b9", "#c45850"],
+                        label: "Total des réduction (en %)",
+                        backgroundColor: ["#da5d5d", "#fbbc69", "#96ed73", "#85e8d6", "#c45850"],
                         borderColor: "#fff",
                         borderWidth: 3,
                         data: data

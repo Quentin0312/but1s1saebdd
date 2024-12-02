@@ -6,25 +6,34 @@
 
 {% block body %}
     <script>
-        function getCategorieClient(e) {
-            if (e == "") {
-                html = `<label for="CatClient" class="form-label">Catégorie de client</label><br>
-                    <select name="CatClient" id="CatClient" class="form-select" required disabled>
-                        <option value="">Sélectionner une catégorie de client</option>
-                    </select>`
-                document.getElementById('categorie-select').innerHTML = html;
-                disableQuantityInput();
+        async function getCategorieClient(typeId) {
+            const selectElement = document.getElementById('CatClient');
 
+            if (typeId === "") {
+                selectElement.innerHTML = `
+                <option value="">Sélectionner une catégorie de client</option>`;
+                selectElement.setAttribute("disabled", "disabled");
             } else {
-                fetch('/reduction/add/categorie?type_id=' + e)
-                    .then(response => response.text())
-                    .then(html => {
-                        document.getElementById('categorie-select').innerHTML = html;
+                try {
+                    const response = await fetch(`/reduction/add/categorie?type_id=${typeId}`);
+                    const data = await response.json();
+
+                    // Générer les options dynamiquement
+                    let options = '<option value="">Sélectionner une catégorie de client</option>';
+                    data.categories.forEach(category => {
+                        options += `<option value="${category.id}" ${category.disabled ? 'disabled' : ''}>
+                                    ${category.nom}
+                                </option>`;
                     });
+
+                    // Injecter les options dans le select
+                    selectElement.innerHTML = options;
+                    selectElement.removeAttribute("disabled");
+                } catch (error) {
+                    console.error("Erreur lors du chargement des catégories :", error);
+                }
             }
         }
-
-
     </script>
     <div class="show-head-content">
         <h3>Ajouter une réduction</h3>
@@ -53,7 +62,7 @@
 
                 <div id="categorie-select" class="mb-3">
                     <label for="CatClient" class="form-label">Catégorie de client</label><br>
-                    <select name="CatClient" id="CatClient" class="form-select" required disabled>
+                    <select name="CatClient" id="CatClient" class="form-select" required>
                         <option value="">Sélectionner une catégorie de client</option>
                     </select>
                 </div>
