@@ -798,7 +798,7 @@ def get_table_filtered_data():
     if category_ids:
         placeholders_categories = ','.join(['%s'] * len(category_ids))
         sql = f'''
-            SELECT Client.id_client, Client.nom_client, Client.prenom_client, Categorie_client.libelle_categorie AS nomCategorie
+            SELECT Client.id_client AS id, Client.nom_client AS nomClient, Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
             FROM Client
             JOIN Achat ON Client.id_client = Achat.id_client
             JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie
@@ -811,7 +811,7 @@ def get_table_filtered_data():
         mycursor.execute(sql, tuple_sql)
     else:
         sql = '''
-            SELECT Client.id_client, Client.nom_client, Client.prenom_client, Categorie_client.libelle_categorie AS nomCategorie
+            SELECT Client.id_client AS id, Client.nom_client AS nomClient, Client.prenom_client AS prenomClient, Categorie_client.libelle_categorie AS nomCategorie
             FROM Client
             JOIN Achat ON Client.id_client = Achat.id_client
             JOIN Categorie_client ON Client.id_categorie = Categorie_client.id_categorie

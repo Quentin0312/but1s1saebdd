@@ -164,14 +164,16 @@
             tableBody.innerHTML = '';
 
             if (data.length > 0) {
+                data.forEach(client => {
                     const table = document.createElement('tr');
                     table.innerHTML = `
-                        <td>{{ clients.id }}</td>
-                        <td>{{ clients.nomClient }}</td>
-                        <td>{{ clients.prenomClient }}</td>
-                        <td>{{ clients.nomCategorie }}</td>
+                        <td>${ client.id }</td>
+                        <td>${ client.nomClient }</td>
+                        <td>${ client.prenomClient }</td>
+                        <td>${ client.nomCategorie }</td>
             `;
                     tableBody.appendChild(table);
+                });
             } else {
                 const table = document.createElement('tr');
                 table.innerHTML = '<td colspan="8">Pas de client pour ces paramètres</td>';
